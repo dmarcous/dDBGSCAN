@@ -24,6 +24,7 @@ Further details in paper : TBD
      the smallest cell area >= 16ε .
   4. isNeighbourInstances - expandable filtering function for enabling extending the
      clustering phase into multiple dimensions. Defaults to True.
+     Input using an integer code of a function given the translator : com.github.dmarcous.ddbgscan.core.CoreConfig.NEIGHBOUR_SIMILARITY_EXTENSION_FUNCTION_TRANSLATOR 
 
 ## Requirements
 
@@ -37,7 +38,7 @@ Scala 2.11.
 
 ```scala
 // import 
-import com.github.dmarcous.dDBGSCAN._
+import com.github.dmarcous.ddbgscan.core.dDBGSCAN
 
 // Run clustering
 println("Starting clustering...")
@@ -57,7 +58,9 @@ You can run dDBGSCAN directly form command line using spark-submit.
 Parameters stated above
 
 ```bash
-/usr/lib/spark/bin/spark-submit --class com.dmarcous.github.dDBGSCAN.CLIRunner /tmp/dDBGSCAN.jar /tmp/input.txt 100 20 14
+## Usage : /usr/lib/spark/bin/spark-submit --class com.dmarcous.github.ddbgscan.api.CLIRunner filename.jar inputFilePath outputFolderPath Epsilon MinPts [NeighborhoodPartitioningLvl] [isNeighbourInstances_function_code]
+
+/usr/lib/spark/bin/spark-submit --class com.dmarcous.github.dDBGSCAN.CLIRunner /tmp/dDBGSCAN.jar /tmp/input.txt /tmp/output/ 100 20 14 0
 ```
 
 ## Credits
