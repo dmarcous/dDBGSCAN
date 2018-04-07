@@ -1,8 +1,6 @@
 package com.github.dmarcous.ddbgscan.core
 
-import CoreConfig.MISSING_NEIGHBORHOOD_LVL
-import CoreConfig.DEFAULT_NEIGHBOUR_SIMILARITY_EXTENSION_FUNCTION
-import CoreConfig.SMALLEST_CELL_AREA_EPSILON_MULTIPLIER
+import com.github.dmarcous.ddbgscan.core.CoreConfig.{MISSING_NEIGHBORHOOD_LVL, SMALLEST_CELL_AREA_EPSILON_MULTIPLIER}
 import com.github.dmarcous.ddbgscan.model.{ClusteringInstance, KeyGeoEntity}
 import com.github.dmarcous.s2utils.s2.S2Utilities
 import org.apache.spark.sql.{Dataset, SparkSession}
@@ -11,14 +9,12 @@ object dDBGSCAN {
 
   def run(@transient spark: SparkSession,
           data: Dataset[(KeyGeoEntity, ClusteringInstance)],
-          epsilon: Double, minPts: Int,
-          inputNeighborhoodPartitioningLvl: Int = MISSING_NEIGHBORHOOD_LVL,
-          isNeighbourInstances: (Any, Any) => Boolean = DEFAULT_NEIGHBOUR_SIMILARITY_EXTENSION_FUNCTION): Dataset[String] =
+          parameters: AlgorithmParameters): Dataset[String] =
   {
     // Init internal parameters
     val neighborhoodPartitioningLvl =
       getNeighborhoodPartitioningLvlIfMissing(
-        inputNeighborhoodPartitioningLvl, epsilon)
+        parameters.neighborhoodPartitioningLvl, parameters.epsilon)
 
     // Partition data
     val partitionedData = null

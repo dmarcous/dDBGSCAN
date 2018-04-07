@@ -1,9 +1,7 @@
 package com.github.dmarcous.ddbgscan.api
 
-import com.github.dmarcous.ddbgscan.core.{GeoPropertiesExtractor, dDBGSCAN}
-import com.github.dmarcous.ddbgscan.core.CoreConfig.MISSING_NEIGHBORHOOD_LVL
-import com.github.dmarcous.ddbgscan.core.CoreConfig.DEFAULT_NEIGHBOUR_SIMILARITY_EXTENSION_FUNCTION
-import com.github.dmarcous.ddbgscan.core.CoreConfig.NEIGHBOUR_SIMILARITY_EXTENSION_FUNCTION_TRANSLATOR
+import com.github.dmarcous.ddbgscan.core.CoreConfig.{DEFAULT_NEIGHBOUR_SIMILARITY_EXTENSION_FUNCTION, MISSING_NEIGHBORHOOD_LVL, NEIGHBOUR_SIMILARITY_EXTENSION_FUNCTION_TRANSLATOR}
+import com.github.dmarcous.ddbgscan.core.{AlgorithmParameters, GeoPropertiesExtractor, dDBGSCAN}
 import org.apache.spark.sql.SparkSession
 
 object CLIRunner {
@@ -27,15 +25,16 @@ object CLIRunner {
 
     // Extract geo data from input and keep rest
     val clusteringData =
-      GeoPropertiesExtractor.fromLonLatDelimitedFile(data,
+      GeoPropertiesExtractor.fromLonLatDelimitedFile(
+        spark,
+        data,
         positionLon = 0, positionLat = 1)
 
     // Run GloVe
     println("Starting clustering...")
     val results =
       dDBGSCAN.run(spark, clusteringData,
-        conf.epsilon, conf.minPts,
-        conf.neighborhoodPartitioningLvl, conf.isNeighbourInstances)
+        conf.parameters)
 
     // Write output
     println("Writing results...")
@@ -45,7 +44,7 @@ object CLIRunner {
 
   private def parseArgs(args: Array[String]) : AlgorithmConfig = {
     val usage = """
-    Usage: /usr/lib/spark/bin/spark-submit /usr/lib/spark/bin/spark-submit --class com.dmarcous.github.ddbgscan.api.CLIRunner filename.jar inputFilePath outputFolderPath Epsilon MinPts [NeighborhoodPartitioningLvl] [isNeighbourInstances_function_code]
+    Usage: /usr/lib/spark/bin/spark-submit --class com.dmarcous.github.ddbgscan.api.CLIRunner [filename.jar] [inputFilePath] [outputFolderPath] [Epsilon] [MinPts] [NeighborhoodPartitioningLvl] [isNeighbourInstances_function_code]
     """
     // Input params
     if (args.length < 4 || args.length > 6)
@@ -75,10 +74,12 @@ object CLIRunner {
     AlgorithmConfig(
       inputPath,
       outputFolderPath,
-      epsilon,
-      minPts,
-      neighborhoodPartitioningLvl,
-      isNeighbourInstances
+      AlgorithmParameters(
+        epsilon,
+        minPts,
+        neighborhoodPartitioningLvl,
+        isNeighbourInstances
+      )
     )
   }
 }
