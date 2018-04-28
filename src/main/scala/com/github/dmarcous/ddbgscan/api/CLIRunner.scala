@@ -1,7 +1,8 @@
 package com.github.dmarcous.ddbgscan.api
 
-import com.github.dmarcous.ddbgscan.core.CoreConfig.{DEFAULT_NEIGHBOUR_SIMILARITY_EXTENSION_FUNCTION, MISSING_NEIGHBORHOOD_LVL, NEIGHBOUR_SIMILARITY_EXTENSION_FUNCTION_TRANSLATOR}
-import com.github.dmarcous.ddbgscan.core.{AlgorithmParameters, GeoPropertiesExtractor, dDBGSCAN}
+import com.github.dmarcous.ddbgscan.core.CoreConfig._
+import com.github.dmarcous.ddbgscan.core._
+import org.apache.spark.ml.linalg.Vector
 import org.apache.spark.sql.SparkSession
 
 object CLIRunner {
@@ -21,14 +22,15 @@ object CLIRunner {
     // Read input file
     val data =
       spark.read
-        .textFile(conf.inputPath)
+        .textFile(conf.ioConfig.inputPath)
 
     // Extract geo data from input and keep rest
     val clusteringData =
       GeoPropertiesExtractor.fromLonLatDelimitedFile(
         spark,
         data,
-        positionLon = 0, positionLat = 1)
+        conf.parameters.neighborhoodPartitioningLvl,
+        conf.ioConfig)
 
     // Run GloVe
     println("Starting clustering...")
@@ -39,41 +41,71 @@ object CLIRunner {
     // Write output
     println("Writing results...")
     results.write
-      .csv(conf.outputFolderPath)
+      .csv(conf.ioConfig.outputFolderPath)
   }
 
-  private def parseArgs(args: Array[String]) : AlgorithmConfig = {
+  def parseArgs(args: Array[String]) : RuntimeConfig = {
     val usage = """
-    Usage: /usr/lib/spark/bin/spark-submit --class com.dmarcous.github.ddbgscan.api.CLIRunner [filename.jar] [inputFilePath] [outputFolderPath] [Epsilon] [MinPts] [NeighborhoodPartitioningLvl] [isNeighbourInstances_function_code]
+    Usage: /usr/lib/spark/bin/spark-submit --class com.dmarcous.github.ddbgscan.api.CLIRunner [filename.jar]
+    [--inputFilePath string] [--outputFolderPath string]
+    [--positionFieldId int] [--positionFieldLon int] [--positionFieldLat int]
+    [--inputFieldDelimiter int]
+    [--epsilon double] [--minPts int]
+    [--neighborhoodPartitioningLvl int] [--isNeighbourInstances_function_code int]
     """
-    // Input params
-    if (args.length < 4 || args.length > 6)
+
+    var inputPath : String = ""
+    var outputFolderPath : String = ""
+    var epsilon : Double = Double.NaN
+    var minPts : Int = Double.NaN.toInt
+    var positionFieldId: Int = NO_UNIQUE_ID_FIELD
+    var positionFieldLon: Int = DEFAULT_LONGITUDE_POSITION_FIELD_NUMBER
+    var positionFieldLat: Int = DEFAULT_LATITUDE_POSITION_FIELD_NUMBER
+    var inputFieldDelimiter : String = DEFAULT_GEO_FILE_DELIMITER
+    var neighborhoodPartitioningLvl : Int = MISSING_NEIGHBORHOOD_LVL
+    var isNeighbourInstances : (Vector, Vector) => Boolean = DEFAULT_NEIGHBOUR_SIMILARITY_EXTENSION_FUNCTION
+
+    args.sliding(2, 2).toList.collect{
+      case Array("--inputFilePath", argInputFilePath: String) => inputPath = argInputFilePath
+      case Array("--positionFieldId", argPositionFieldId: String) => positionFieldId = argPositionFieldId.toInt
+      case Array("--positionFieldLon", argPositionFieldLon: String) => positionFieldLon= argPositionFieldLon.toInt
+      case Array("--positionFieldLat", argPositionFieldLat: String) => positionFieldLat = argPositionFieldLat.toInt
+      case Array("--inputFieldDelimiter", argOnputFieldDelimiter: String) => inputFieldDelimiter = argOnputFieldDelimiter
+      case Array("--outputFolderPath", argOutputFolderPath: String) => outputFolderPath = argOutputFolderPath
+      case Array("--epsilon", argEpsilon: String) => epsilon = argEpsilon.toDouble
+      case Array("--minPts", argMinPts: String) => minPts = argMinPts.toInt
+      case Array("--neighborhoodPartitioningLvl", argNeighborhoodPartitioningLvl: String) => neighborhoodPartitioningLvl = argNeighborhoodPartitioningLvl.toInt
+      case Array("--isNeighbourInstances_function_code", argIsNeighbourInstances_function_code: String) => isNeighbourInstances = NEIGHBOUR_SIMILARITY_EXTENSION_FUNCTION_TRANSLATOR(argIsNeighbourInstances_function_code.toInt)
+    }
+
+    // Make sure all mandatory params are in place
+    if (inputPath.isEmpty || outputFolderPath.isEmpty || epsilon.isNaN || minPts.isNaN)
     {
       println(usage)
       System.exit(1)
     }
 
-    val inputPath = args(0)
-    val outputFolderPath = args(1)
-    val epsilon = args(2).toDouble
-    val minPts = args(3).toInt
-    val neighborhoodPartitioningLvl = if (args.length > 4) args(4).toInt else MISSING_NEIGHBORHOOD_LVL
-    val isNeighbourInstances =
-      if (args.length > 5 &&
-          args(5).toInt < NEIGHBOUR_SIMILARITY_EXTENSION_FUNCTION_TRANSLATOR.keySet.size)
-        NEIGHBOUR_SIMILARITY_EXTENSION_FUNCTION_TRANSLATOR.getOrElse(args(5).toInt, DEFAULT_NEIGHBOUR_SIMILARITY_EXTENSION_FUNCTION)
-      else DEFAULT_NEIGHBOUR_SIMILARITY_EXTENSION_FUNCTION
 
     println("inputPath : " + inputPath)
+    println("positionFieldId : " + positionFieldId)
+    println("positionFieldLon : " + positionFieldLon)
+    println("positionFieldLat : " + positionFieldLat)
+    println("inputFieldDelimiter : " + inputFieldDelimiter)
     println("outputFolderPath : " + outputFolderPath)
     println("epsilon : " + epsilon)
     println("minPts : " + minPts)
     println("neighborhoodPartitioningLvl : " + neighborhoodPartitioningLvl)
-    println("isNeighbourInstances : " + isNeighbourInstances.toString)
+    println("isNeighbourInstances function code : " + isNeighbourInstances.toString())
 
-    AlgorithmConfig(
-      inputPath,
-      outputFolderPath,
+    RuntimeConfig(
+      IOConfig(
+        inputPath,
+        outputFolderPath,
+        positionFieldId,
+        positionFieldLon,
+        positionFieldLat,
+        inputFieldDelimiter
+      ),
       AlgorithmParameters(
         epsilon,
         minPts,

@@ -1,11 +1,11 @@
 package com.github.dmarcous.ddbgscan.api
 
-import com.github.dmarcous.ddbgscan.core.AlgorithmParameters
-import com.github.dmarcous.ddbgscan.core.CoreConfig.{DEFAULT_NEIGHBOUR_SIMILARITY_EXTENSION_FUNCTION, MISSING_NEIGHBORHOOD_LVL}
+import com.github.dmarcous.ddbgscan.core.{AlgorithmParameters, IOConfig}
+import com.github.dmarcous.ddbgscan.core.CoreConfig._
 import org.scalatest.FlatSpec
 import org.scalatest.Matchers._
 
-class AlgorithmConfigTest extends FlatSpec{
+class RuntimeConfigTest extends FlatSpec{
   val epsilon = 10.0
   val minPts = 5
   val neighborhoodPartitioningLvl = 14
@@ -18,18 +18,28 @@ class AlgorithmConfigTest extends FlatSpec{
   )
   val inputPath = "s3://my.bucket/ddbgscan/inputs/input.csv"
   val outputFolderPath = "s3://my.bucket/ddbgscan/outputs/"
+  val positionId = NO_UNIQUE_ID_FIELD
+  val positionLon = DEFAULT_LONGITUDE_POSITION_FIELD_NUMBER
+  val positionLat = DEFAULT_LATITUDE_POSITION_FIELD_NUMBER
+  val delimiter = DEFAULT_GEO_FILE_DELIMITER
+  val ioConfig = IOConfig(
+    inputPath,
+    outputFolderPath,
+    positionId,
+    positionLon,
+    positionLat,
+    delimiter
+  )
 
   "Full constructor" should "return a valid object" in
   {
     val conf =
-      AlgorithmConfig(
-        inputPath,
-        outputFolderPath,
+      RuntimeConfig(
+        ioConfig,
         parameters
       )
 
-    conf.inputPath should equal(inputPath)
-    conf.outputFolderPath should equal(outputFolderPath)
+    conf.ioConfig should equal(ioConfig)
     conf.parameters should equal(parameters)
 
   }
@@ -37,17 +47,23 @@ class AlgorithmConfigTest extends FlatSpec{
   "Short constructor" should "return a valid object with defaults" in
   {
     val conf =
-      AlgorithmConfig(
-        inputPath,
-        outputFolderPath,
+      RuntimeConfig(
+        IOConfig(
+          inputPath,
+          outputFolderPath
+        ),
         AlgorithmParameters(
           epsilon,
           minPts
         )
       )
 
-    conf.inputPath should equal(inputPath)
-    conf.outputFolderPath should equal(outputFolderPath)
+    conf.ioConfig.inputPath should equal (inputPath)
+    conf.ioConfig.outputFolderPath should equal (outputFolderPath)
+    conf.ioConfig.positionId should equal (positionId)
+    conf.ioConfig.positionLon should equal (positionLon)
+    conf.ioConfig.positionLat should equal (positionLat)
+    conf.ioConfig.inputDelimiter should equal (delimiter)
     conf.parameters.epsilon should equal(epsilon)
     conf.parameters.minPts should equal(minPts)
     conf.parameters.neighborhoodPartitioningLvl should equal(MISSING_NEIGHBORHOOD_LVL)

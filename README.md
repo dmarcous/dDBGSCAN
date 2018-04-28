@@ -26,6 +26,11 @@ Further details in paper : TBD
      clustering phase into multiple dimensions. Defaults to True.
      Input using an integer code of a function given the translator : com.github.dmarcous.ddbgscan.core.CoreConfig.NEIGHBOUR_SIMILARITY_EXTENSION_FUNCTION_TRANSLATOR 
 
+### Caveats
+
+  1. Current version supports only numeric data as vector values (for distances compute between clustering instances)
+  2. Current version does not support null values in data vectors
+
 ## Requirements
 
 Spark 2.2+.
