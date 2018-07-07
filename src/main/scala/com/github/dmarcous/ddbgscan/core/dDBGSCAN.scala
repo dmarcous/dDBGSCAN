@@ -11,10 +11,10 @@ object dDBGSCAN {
          ): Dataset[String] =
   {
     // Partition data
-    val partitionedData = null
+    val partitionedData = DataPartitionerS2.partitionData(spark, data)
 
     // Perform local clustering
-    val locallyClusteredData = null
+    val locallyClusteredData = DataGeoClusterer.clusterGeoData(spark, partitionedData, parameters)
 
     // Perform global merging
     val globallyClusteredData = null

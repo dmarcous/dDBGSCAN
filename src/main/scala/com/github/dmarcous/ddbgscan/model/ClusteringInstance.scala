@@ -8,6 +8,7 @@ case class ClusteringInstance(
    var cluster : Long = UNKNOWN_CLUSTER,
    var isVisited : Boolean = false,
    var instanceStatus : Int = ClusteringInstanceStatusValue.UNKNOWN.value,
+   lonLatLocation : (Double, Double),
    features : Vector
 ) {
 }

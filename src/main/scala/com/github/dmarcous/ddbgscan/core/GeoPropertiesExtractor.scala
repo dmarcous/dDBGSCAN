@@ -36,7 +36,7 @@ object GeoPropertiesExtractor {
       }
       .map{case(id, lon, lat, features) =>
         (new KeyGeoEntity(LonLatGeoEntity(lon, lat), neighborhoodPartitioningLvl),
-          ClusteringInstance(recordId = id, features = features)
+          ClusteringInstance(recordId = id, lonLatPostion = (lon, lat), features = features)
         )
       }
   }
@@ -69,7 +69,7 @@ object GeoPropertiesExtractor {
       }
       .map{case(id, lon, lat, features) =>
         (new KeyGeoEntity(LonLatGeoEntity(lon, lat), neighborhoodPartitioningLvl),
-          new ClusteringInstance(recordId = id, features = features)
+          new ClusteringInstance(recordId = id, lonLatPostion = (lon, lat), features = features)
         )
       }
   }

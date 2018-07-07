@@ -47,10 +47,10 @@ object CLIRunner {
   def parseArgs(args: Array[String]) : RuntimeConfig = {
     val usage = """
     Usage: /usr/lib/spark/bin/spark-submit --class com.dmarcous.github.ddbgscan.api.CLIRunner [filename.jar]
-    [--inputFilePath string] [--outputFolderPath string]
+    --inputFilePath [string] --outputFolderPath [string]
+    --epsilon [double] --minPts [int]
     [--positionFieldId int] [--positionFieldLon int] [--positionFieldLat int]
     [--inputFieldDelimiter int]
-    [--epsilon double] [--minPts int]
     [--neighborhoodPartitioningLvl int] [--isNeighbourInstances_function_code int]
     """
 

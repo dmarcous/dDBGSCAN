@@ -10,6 +10,7 @@ class ClusteringInstanceTest extends FlatSpec{
   val cluster = 1L
   val isVisited = true
   val instanceStatus = ClusteringInstanceStatusValue.CORE.value
+  val lonLatLocation = (34.779624, 32.073051)
   val features = Vectors.dense(1.0,2.0,3.0)
   val emptyFeatures = Vectors.zeros(0)
 
@@ -21,6 +22,7 @@ class ClusteringInstanceTest extends FlatSpec{
         cluster,
         isVisited,
         instanceStatus,
+        lonLatLocation,
         features
       )
 
@@ -28,6 +30,7 @@ class ClusteringInstanceTest extends FlatSpec{
     instance.cluster should equal(cluster)
     instance.isVisited should equal(isVisited)
     instance.instanceStatus should equal(instanceStatus)
+    instance.lonLatLocation should equal(lonLatLocation)
     instance.features should equal(features)
 
   }
@@ -37,6 +40,7 @@ class ClusteringInstanceTest extends FlatSpec{
     val instance =
       ClusteringInstance(
         recordId = recordId,
+        lonLatLocation = lonLatLocation,
         features = emptyFeatures
       )
 
@@ -44,6 +48,7 @@ class ClusteringInstanceTest extends FlatSpec{
     instance.cluster should equal(UNKNOWN_CLUSTER)
     instance.isVisited should equal(false)
     instance.instanceStatus should equal(ClusteringInstanceStatusValue.UNKNOWN.value)
+    instance.lonLatLocation should equal(lonLatLocation)
     instance.features should equal(emptyFeatures)
   }
 

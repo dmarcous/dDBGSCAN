@@ -9,6 +9,7 @@ class RuntimeConfigTest extends FlatSpec{
   val epsilon = 10.0
   val minPts = 5
   val neighborhoodPartitioningLvl = 14
+  val completedNeighborhoodPartitioningLvl = 18
   val isNeighbourInstances = DEFAULT_NEIGHBOUR_SIMILARITY_EXTENSION_FUNCTION
   val parameters = AlgorithmParameters(
     epsilon,
@@ -66,7 +67,7 @@ class RuntimeConfigTest extends FlatSpec{
     conf.ioConfig.inputDelimiter should equal (delimiter)
     conf.parameters.epsilon should equal(epsilon)
     conf.parameters.minPts should equal(minPts)
-    conf.parameters.neighborhoodPartitioningLvl should equal(MISSING_NEIGHBORHOOD_LVL)
+    conf.parameters.neighborhoodPartitioningLvl should equal(completedNeighborhoodPartitioningLvl)
     conf.parameters.isNeighbourInstances should equal(DEFAULT_NEIGHBOUR_SIMILARITY_EXTENSION_FUNCTION)
 
   }
