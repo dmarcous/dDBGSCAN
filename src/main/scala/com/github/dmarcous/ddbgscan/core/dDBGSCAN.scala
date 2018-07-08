@@ -11,7 +11,9 @@ object dDBGSCAN {
          ): Dataset[String] =
   {
     // Partition data
-    val partitionedData = DataPartitionerS2.partitionData(spark, data)
+    val partitionedData =
+      DataPartitionerS2.partitionData(spark, data,
+        parameters.epsilon, parameters.neighborhoodPartitioningLvl)
 
     // Perform local clustering
     val locallyClusteredData = DataGeoClusterer.clusterGeoData(spark, partitionedData, parameters)

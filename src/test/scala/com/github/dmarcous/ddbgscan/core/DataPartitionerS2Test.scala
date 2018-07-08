@@ -17,6 +17,8 @@ class DataPartitionerS2Test extends FlatSpec{
   import spark.implicits._
 
   val S2_LVL = 15
+  val epsilon_in_range = 10.0
+  val epsilon_outside_range = 100.0
   val GEO_DATA_KEYS = Array(1521455259027767296L,1521455265470218240L)
   val GEO_DATA_VALUES =
     Array(
@@ -55,13 +57,18 @@ class DataPartitionerS2Test extends FlatSpec{
   "fromLonLatDelimitedFile" should "transform a geo delimited dataset with default properties to a geo clustering input dataset" in
   {
     import spark.implicits._
-    val partitionedData = DataPartitionerS2.partitionData(spark, clusteringDataset)
+    val partitionedData = DataPartitionerS2.partitionData(spark, clusteringDataset, epsilon_in_range, S2_LVL)
 
     partitionedData.flatMapGroups((key, vals) => (vals.toList)).collect().foreach(println)
 
     partitionedData.keys.count() should equal(2)
     partitionedData.keys.collect() should equal (GEO_DATA_KEYS)
     partitionedData.flatMapGroups((key, vals) => vals.map(_.features.toArray).toList).collect() should equal (GEO_DATA_VALUES)
+  }
+
+  "getDensityReachableCells" should "be tested" in
+  {
+
   }
 
 }
