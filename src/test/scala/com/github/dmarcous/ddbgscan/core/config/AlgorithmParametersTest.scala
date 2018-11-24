@@ -1,6 +1,6 @@
-package com.github.dmarcous.ddbgscan.core
+package com.github.dmarcous.ddbgscan.core.config
 
-import com.github.dmarcous.ddbgscan.core.CoreConfig.{DEFAULT_NEIGHBOUR_SIMILARITY_EXTENSION_FUNCTION, MISSING_NEIGHBORHOOD_LVL}
+import com.github.dmarcous.ddbgscan.core.config.CoreConfig.{DEFAULT_NEIGHBOUR_SIMILARITY_EXTENSION_FUNCTION, MISSING_NEIGHBORHOOD_LVL}
 import org.scalatest.FlatSpec
 import org.scalatest.Matchers._
 

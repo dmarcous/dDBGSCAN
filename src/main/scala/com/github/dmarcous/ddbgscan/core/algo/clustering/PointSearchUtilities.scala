@@ -1,11 +1,13 @@
-package com.github.dmarcous.ddbgscan.core
+package com.github.dmarcous.ddbgscan.core.algo.clustering
 
-import com.github.davidmoten.rtree.geometry.{Geometries, Point, Rectangle}
+import java.util.ArrayList
+
 import com.github.davidmoten.grumpy.core.Position
+import com.github.davidmoten.rtree.geometry.{Geometries, Point, Rectangle}
 import com.github.davidmoten.rtree.{Entries, Entry, RTree}
 import com.github.dmarcous.ddbgscan.model.ClusteringInstance
 import rx.functions.Func1
-import java.util.ArrayList
+
 import scala.collection.JavaConverters._
 
 object PointSearchUtilities {

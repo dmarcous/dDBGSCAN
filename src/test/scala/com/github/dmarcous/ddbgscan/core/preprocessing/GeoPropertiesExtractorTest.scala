@@ -1,9 +1,9 @@
-package com.github.dmarcous.ddbgscan.core
+package com.github.dmarcous.ddbgscan.core.preprocessing
 
-import com.github.dmarcous.ddbgscan.core.CoreConfig.{DEFAULT_GEO_FILE_DELIMITER, DEFAULT_LATITUDE_POSITION_FIELD_NUMBER, DEFAULT_LONGITUDE_POSITION_FIELD_NUMBER, NO_UNIQUE_ID_FIELD}
-import org.apache.spark.ml.linalg.Vectors
-import org.apache.spark.sql.{Row, SparkSession}
+import com.github.dmarcous.ddbgscan.core.config.CoreConfig.{DEFAULT_GEO_FILE_DELIMITER, DEFAULT_LATITUDE_POSITION_FIELD_NUMBER, DEFAULT_LONGITUDE_POSITION_FIELD_NUMBER, NO_UNIQUE_ID_FIELD}
+import com.github.dmarcous.ddbgscan.core.config.IOConfig
 import org.apache.spark.sql.types.{DoubleType, IntegerType, StructField, StructType}
+import org.apache.spark.sql.{Row, SparkSession}
 import org.scalatest.FlatSpec
 import org.scalatest.Matchers._
 

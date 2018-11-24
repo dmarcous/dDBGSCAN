@@ -1,7 +1,7 @@
 package com.github.dmarcous.ddbgscan.api
 
-import com.github.dmarcous.ddbgscan.core.CoreConfig._
-import com.github.dmarcous.ddbgscan.core.{AlgorithmParameters, IOConfig}
+import com.github.dmarcous.ddbgscan.core.config.CoreConfig._
+import com.github.dmarcous.ddbgscan.core.config.{AlgorithmParameters, IOConfig}
 import org.scalatest.FlatSpec
 import org.scalatest.Matchers._
 

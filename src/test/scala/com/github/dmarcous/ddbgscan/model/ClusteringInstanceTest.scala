@@ -1,6 +1,6 @@
 package com.github.dmarcous.ddbgscan.model
 
-import com.github.dmarcous.ddbgscan.core.CoreConfig.{ClusteringInstanceStatus, ClusteringInstanceStatusValue, UNKNOWN_CLUSTER}
+import com.github.dmarcous.ddbgscan.core.config.CoreConfig.{ClusteringInstanceStatusValue, UNKNOWN_CLUSTER}
 import org.apache.spark.ml.linalg.Vectors
 import org.scalatest.FlatSpec
 import org.scalatest.Matchers._

@@ -1,4 +1,4 @@
-package com.github.dmarcous.ddbgscan.core
+package com.github.dmarcous.ddbgscan.core.config
 
 import com.github.dmarcous.s2utils.geo.GeographyUtilities
 import com.vividsolutions.jts.geom.Point

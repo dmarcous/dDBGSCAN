@@ -1,11 +1,10 @@
-package com.github.dmarcous.ddbgscan.core
+package com.github.dmarcous.ddbgscan.core.algo.clustering
 
-
-import com.github.davidmoten.rtree.geometry.{Point}
+import com.github.davidmoten.rtree.geometry.Point
 import com.github.davidmoten.rtree.{Entry, RTree}
+import com.github.dmarcous.ddbgscan.core.config.CoreConfig.DEFAULT_NEIGHBOUR_SIMILARITY_EXTENSION_FUNCTION
 import com.github.dmarcous.ddbgscan.model.ClusteringInstance
 import org.apache.spark.ml.linalg.Vector
-import com.github.dmarcous.ddbgscan.core.CoreConfig.{DEFAULT_NEIGHBOUR_SIMILARITY_EXTENSION_FUNCTION}
 
 object NeighbourUtilities {
 

@@ -1,7 +1,9 @@
 package com.github.dmarcous.ddbgscan.api
 
-import com.github.dmarcous.ddbgscan.core.CoreConfig._
-import com.github.dmarcous.ddbgscan.core._
+import com.github.dmarcous.ddbgscan.core.config.CoreConfig._
+import com.github.dmarcous.ddbgscan.core.algo.dDBGSCAN
+import com.github.dmarcous.ddbgscan.core.config.{AlgorithmParameters, IOConfig}
+import com.github.dmarcous.ddbgscan.core.preprocessing.GeoPropertiesExtractor
 import org.apache.spark.ml.linalg.Vector
 import org.apache.spark.sql.SparkSession
 

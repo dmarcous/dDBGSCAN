@@ -1,11 +1,15 @@
-package com.github.dmarcous.ddbgscan.core
+package com.github.dmarcous.ddbgscan.core.algo.clustering
 
 import com.github.davidmoten.rtree.geometry.Geometries
-import com.github.dmarcous.ddbgscan.core.CoreConfig.{DEFAULT_GEO_FILE_DELIMITER, DEFAULT_LATITUDE_POSITION_FIELD_NUMBER, DEFAULT_LONGITUDE_POSITION_FIELD_NUMBER, NO_UNIQUE_ID_FIELD}
+import com.github.dmarcous.ddbgscan.core.algo.partitioning.DataPartitionerS2
+import com.github.dmarcous.ddbgscan.core.config.CoreConfig.{DEFAULT_GEO_FILE_DELIMITER, DEFAULT_LATITUDE_POSITION_FIELD_NUMBER, DEFAULT_LONGITUDE_POSITION_FIELD_NUMBER, NO_UNIQUE_ID_FIELD}
+import com.github.dmarcous.ddbgscan.core.config.IOConfig
+import com.github.dmarcous.ddbgscan.core.preprocessing.GeoPropertiesExtractor
 import org.apache.spark.sql.SparkSession
-import scala.collection.JavaConverters._
 import org.scalatest.FlatSpec
 import org.scalatest.Matchers._
+
+import scala.collection.JavaConverters._
 
 class PointSearchUtilitiesTest extends FlatSpec{
 

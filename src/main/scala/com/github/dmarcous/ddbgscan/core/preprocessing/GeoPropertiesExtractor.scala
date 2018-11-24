@@ -1,8 +1,7 @@
-package com.github.dmarcous.ddbgscan.core
+package com.github.dmarcous.ddbgscan.core.preprocessing
 
-import com.github.dmarcous.ddbgscan.core.CoreConfig.DEFAULT_GEO_FILE_DELIMITER
-import com.github.dmarcous.ddbgscan.core.CoreConfig.NO_UNIQUE_ID_FIELD
-import com.github.dmarcous.ddbgscan.core.CoreConfig.DEFAULT_RECORD_ID
+import com.github.dmarcous.ddbgscan.core.config.CoreConfig.{DEFAULT_GEO_FILE_DELIMITER, DEFAULT_RECORD_ID, NO_UNIQUE_ID_FIELD}
+import com.github.dmarcous.ddbgscan.core.config.IOConfig
 import com.github.dmarcous.ddbgscan.model.{ClusteringInstance, KeyGeoEntity, LonLatGeoEntity}
 import org.apache.spark.ml.linalg.Vectors
 import org.apache.spark.sql.{DataFrame, Dataset, SparkSession}

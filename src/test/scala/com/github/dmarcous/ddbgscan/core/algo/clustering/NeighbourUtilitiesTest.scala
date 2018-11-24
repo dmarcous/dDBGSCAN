@@ -1,8 +1,10 @@
-package com.github.dmarcous.ddbgscan.core
+package com.github.dmarcous.ddbgscan.core.algo.clustering
 
-import com.github.dmarcous.ddbgscan.core.CoreConfig.DEFAULT_NEIGHBOUR_SIMILARITY_EXTENSION_FUNCTION
-import com.github.dmarcous.ddbgscan.core.CoreConfig.{DEFAULT_GEO_FILE_DELIMITER, DEFAULT_LATITUDE_POSITION_FIELD_NUMBER, DEFAULT_LONGITUDE_POSITION_FIELD_NUMBER, NO_UNIQUE_ID_FIELD}
-import com.github.dmarcous.ddbgscan.core.NeighbourUtilities.applyUserDefinedFiltering
+import com.github.dmarcous.ddbgscan.core.algo.clustering.NeighbourUtilities.applyUserDefinedFiltering
+import com.github.dmarcous.ddbgscan.core.algo.partitioning.DataPartitionerS2
+import com.github.dmarcous.ddbgscan.core.config.CoreConfig._
+import com.github.dmarcous.ddbgscan.core.config.IOConfig
+import com.github.dmarcous.ddbgscan.core.preprocessing.GeoPropertiesExtractor
 import org.apache.spark.ml.linalg.Vector
 import org.apache.spark.sql.SparkSession
 import org.scalatest.FlatSpec

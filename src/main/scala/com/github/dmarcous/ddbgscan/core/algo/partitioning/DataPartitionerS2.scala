@@ -1,10 +1,12 @@
-package com.github.dmarcous.ddbgscan.core
+package com.github.dmarcous.ddbgscan.core.algo.partitioning
 
 import java.util.ArrayList
+
 import com.github.dmarcous.ddbgscan.model.{ClusteringInstance, KeyGeoEntity}
 import com.github.dmarcous.s2utils.converters.UnitConverters
 import com.google.common.geometry.{S2Cap, S2CellId, S2LatLng, S2RegionCoverer}
 import org.apache.spark.sql.{Dataset, KeyValueGroupedDataset, SparkSession}
+
 import scala.collection.JavaConverters._
 
 object DataPartitionerS2 {

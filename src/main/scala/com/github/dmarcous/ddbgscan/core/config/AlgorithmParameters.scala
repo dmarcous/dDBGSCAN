@@ -1,6 +1,6 @@
-package com.github.dmarcous.ddbgscan.core
+package com.github.dmarcous.ddbgscan.core.config
 
-import com.github.dmarcous.ddbgscan.core.CoreConfig.{DEFAULT_NEIGHBOUR_SIMILARITY_EXTENSION_FUNCTION, MISSING_NEIGHBORHOOD_LVL, SMALLEST_CELL_AREA_EPSILON_MULTIPLIER}
+import CoreConfig.{DEFAULT_NEIGHBOUR_SIMILARITY_EXTENSION_FUNCTION, MISSING_NEIGHBORHOOD_LVL, SMALLEST_CELL_AREA_EPSILON_MULTIPLIER}
 import com.github.dmarcous.s2utils.s2.S2Utilities
 import org.apache.spark.ml.linalg.Vector
 
