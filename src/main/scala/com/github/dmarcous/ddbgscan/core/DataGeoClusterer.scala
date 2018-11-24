@@ -1,8 +1,9 @@
 package com.github.dmarcous.ddbgscan.core
 
-import com.github.davidmoten.rtree.{Entries, RTree}
-import com.github.davidmoten.rtree.geometry.{Geometries, Point}
-import com.github.dmarcous.ddbgscan.core.CoreConfig.UNKNOWN_CLUSTER
+import com.github.davidmoten.rtree.{Entry, RTree}
+import com.github.davidmoten.rtree.geometry.Point
+import com.github.dmarcous.ddbgscan.core.CoreConfig.ClusteringInstanceStatusValue.NOISE
+import com.github.dmarcous.ddbgscan.core.CoreConfig.{UNKNOWN_CLUSTER}
 import com.github.dmarcous.ddbgscan.model.ClusteringInstance
 import org.apache.spark.sql.{Dataset, KeyValueGroupedDataset, SparkSession}
 
@@ -29,20 +30,46 @@ object DataGeoClusterer {
                      parameters: AlgorithmParameters
          ): List[ClusteringInstance] =
   {
-    val entryList = data.map(instance =>
-      Entries.entry(instance,
-                    Geometries.pointGeographic(
-                      instance.lonLatLocation._1,
-                      instance.lonLatLocation._2))).toList.asJava
-    val searchTree = RTree.star().create[ClusteringInstance, Point](entryList)
+    var currentCluster = UNKNOWN_CLUSTER
 
-    var curCluster = UNKNOWN_CLUSTER
-
+    val instances = data.toList
+    val searchTree = PointSearchUtilities.buildPointGeometrySearchTree(instances)
     searchTree.entries().toBlocking().toIterable.asScala.foreach{
-      case (x) =>
-      x
-    }
+      // point - same p as in DBSCAN original implementation
+      case (p) => {
+        // Go over all unvisited points
+        if (!p.value().isVisited)
+        {
+          // TODO : verify that this actually works and is mutable
+          p.value().isVisited = true
 
-    searchTree.entries().toBlocking().toIterable.asScala.map{case(entry) => entry.value()}.toList
+          // Find neighbours
+          val neighbours = NeighbourUtilities.getNeighbours(p,
+            parameters.epsilon, searchTree, parameters.isNeighbourInstances)
+
+          if (neighbours.size < parameters.minPts)
+          {
+            p.value().instanceStatus = NOISE.value
+          }
+          else
+          {
+            currentCluster += 1
+            expandCluster(p, neighbours, searchTree, currentCluster)
+          }
+
+        }// traverse unvisited points
+      }
+    }// traverse points
+
+    PointSearchUtilities.getClusteringInstancesFromSearchTree(searchTree)
   }
+
+  def expandCluster(p: Entry[ClusteringInstance, Point], neighbours: List[Entry[ClusteringInstance, Point]],
+                    searchTree: RTree[ClusteringInstance, Point], currentCluster: Long): Unit =
+  {
+
+  }
+
+
+
 }

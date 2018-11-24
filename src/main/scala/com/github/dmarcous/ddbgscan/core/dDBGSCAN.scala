@@ -10,7 +10,7 @@ object dDBGSCAN {
           parameters: AlgorithmParameters
          ): Dataset[String] =
   {
-    // Partition data
+    // Partition data w/ duplicates (density reachable)
     val partitionedData =
       DataPartitionerS2.partitionData(spark, data,
         parameters.epsilon, parameters.neighborhoodPartitioningLvl)

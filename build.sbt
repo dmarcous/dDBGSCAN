@@ -23,6 +23,8 @@ libraryDependencies += "com.github.dmarcous" %% "s2utils" % "1.1.1"
 
 // R*tree
 libraryDependencies += "com.github.davidmoten" % "rtree" % "0.8.4"
+libraryDependencies += "com.github.davidmoten" % "grumpy-core" % "0.2.2"
+libraryDependencies += "io.reactivex" % "rxscala_2.11" % "0.26.5"
 
 // Testing framework
 libraryDependencies += "org.scalatest" % "scalatest_2.11" % "3.0.+" % "test"

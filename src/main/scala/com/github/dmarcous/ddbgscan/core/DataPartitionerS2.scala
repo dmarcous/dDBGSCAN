@@ -18,6 +18,7 @@ object DataPartitionerS2 {
     import spark.implicits._
 
     val cellReachableData = data.map{case(key, instance) =>
+      // Using data from instance instead of key for safe conversion (key isn't redundant as its used for input validation)
       (DataPartitionerS2.getDensityReachableCells(
         instance.lonLatLocation._1, instance.lonLatLocation._2, neighborhoodPartitioningLvl, epsilon), instance)}
     val keyValData = cellReachableData.flatMap{case(cells, instance) => cells.map{case(cellId) => (cellId, instance)}}
@@ -26,7 +27,15 @@ object DataPartitionerS2 {
     groupedData
   }
 
-  //TODO : test
+  def getDensityReachableCells(pointGeoKey: KeyGeoEntity, epsilon: Double): List[Long] =
+  {
+    getDensityReachableCells(
+      pointGeoKey.geoData(0).toDouble,
+      pointGeoKey.geoData(1).toDouble,
+      pointGeoKey.level,
+      epsilon)
+  }
+
   def getDensityReachableCells(lon: Double, lat: Double, level : Int, epsilon: Double): List[Long] =
   {
     val startPoint = S2LatLng.fromDegrees(lat, lon).normalized().toPoint
