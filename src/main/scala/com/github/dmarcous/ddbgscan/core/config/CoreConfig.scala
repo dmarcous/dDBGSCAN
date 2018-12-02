@@ -31,7 +31,7 @@ object CoreConfig {
     .withDefaultValue(DEFAULT_NEIGHBOUR_SIMILARITY_EXTENSION_FUNCTION)
 
   // Clustering instance properties
-  val UNKNOWN_CLUSTER = 0L
+  val UNKNOWN_CLUSTER = -1L
 
   sealed trait ClusteringInstanceStatus {
     def value: Int

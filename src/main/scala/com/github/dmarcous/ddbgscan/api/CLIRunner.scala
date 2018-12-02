@@ -19,6 +19,9 @@ object CLIRunner {
         .appName(appName)
         .getOrCreate()
 
+    // Setup - make sure to have spark checkpoint dir set for graphframes connected components algorithm
+    spark.sparkContext.setCheckpointDir("/tmp")
+
     val conf = parseArgs(args)
 
     // Read input file

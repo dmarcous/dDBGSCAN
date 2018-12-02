@@ -59,7 +59,7 @@ class NeighbourUtilitiesTest extends FlatSpec{
       spark, defaultLonLatDelimitedGeoData, S2_LVL, ioConfig
     )
   val partitionedData = DataPartitionerS2.partitionData(spark, clusteringDataset, epsilon, S2_LVL)
-  val instances = partitionedData.flatMapGroups((key, vals) => (vals.toList)).collect().toList.distinct
+  val instances = partitionedData.filter(_._1==1521455263322734592L).flatMap(_._2.toList).collect().toList.distinct
   val searchTree = PointSearchUtilities.buildPointGeometrySearchTree(instances)
 
   val default_similarity_function = DEFAULT_NEIGHBOUR_SIMILARITY_EXTENSION_FUNCTION

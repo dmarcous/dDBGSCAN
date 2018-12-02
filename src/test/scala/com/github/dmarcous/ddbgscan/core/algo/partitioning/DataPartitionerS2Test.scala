@@ -22,16 +22,13 @@ class DataPartitionerS2Test extends FlatSpec{
   val epsilon_in_range = 10.0
   val epsilon_partly_outside_range = 100.0
   val epsilon_fully_outside_range = 250.0
-  val GEO_DATA_KEYS = Array(1521455269765185536L, 1521455263322734592L,
-    1521455261175250944L, 1521455259027767296L)
+  val GEO_DATA_KEYS = Array(1521455269765185536L, 1521455263322734592L)
   val GEO_DATA_VALUES =
     Array(
       Array(1.0, 2.0, 3.0, 4.0, 5.0),
       Array(6.0, 7.0, 8.0, 9.0, 10.0),
       Array(1.0, 2.0, 3.0, 4.0, 5.0),
-      Array(6.0, 7.0, 8.0, 9.0, 10.0),
-      Array(1.0, 2.0, 3.0, 4.0, 5.0),
-      Array(1.0, 2.0, 3.0, 4.0, 5.0)
+      Array(6.0, 7.0, 8.0, 9.0, 10.0)
     )
 
   val lon = 34.777547
@@ -128,28 +125,22 @@ class DataPartitionerS2Test extends FlatSpec{
     val partitionedData = DataPartitionerS2.partitionData(spark, clusteringDataset, epsilon_partly_outside_range, S2_LVL)
     import spark.implicits._
 
-    partitionedData.flatMapGroups((key, vals) => (vals.toList)).collect().foreach(println)
+    partitionedData.flatMap(_._2.toList).collect().foreach(println)
 
-    partitionedData.keys.count() should equal(4)
-    partitionedData.keys.collect() should contain theSameElementsAs (GEO_DATA_KEYS)
-    partitionedData.flatMapGroups((key, vals) => vals.map(_.features.toArray).toList).collect() should contain theSameElementsAs (GEO_DATA_VALUES)
+    partitionedData.count() should equal(2)
+    partitionedData.map(_._1).collect() should contain theSameElementsAs (GEO_DATA_KEYS)
+    partitionedData.flatMap(_._2.toList).map(_.features.toArray.toList).collect() should contain theSameElementsAs (GEO_DATA_VALUES)
   }
   it should "replicate instances to reachable cells" in
   {
     val partitionedData = DataPartitionerS2.partitionData(spark, complexDataset, epsilon_partly_outside_range, S2_LVL)
     import spark.implicits._
 
-    val collectedPartitionedData = partitionedData.flatMapGroups{case(key, vals) => (vals.map(instance => (key,instance)))}.collect()
+    val collectedPartitionedData = partitionedData.flatMap{case(key, vals) => (vals.map(instance => (key,instance)))}.collect()
 
     collectedPartitionedData.foreach(println)
-    collectedPartitionedData.map(_._1).distinct.size should equal (5)
+    collectedPartitionedData.map(_._1).distinct.size should equal (3)
 
-    //    //neviim cell
-    //    (1521455267617701888,ClusteringInstance(1,0,false,4,(34.778023,32.073889),[6.0,7.0]))
-    //    (1521455267617701888,ClusteringInstance(1,0,false,4,(34.778137,32.074229),[10.0,11.0]))
-    collectedPartitionedData.filter(_._1==1521455267617701888L).size should equal (2)
-    collectedPartitionedData.filter(_._1==1521455267617701888L).map(_._2.features(0)) should
-      contain theSameElementsAs (List(6.0, 10.0))
     //    //voodo cell
     //    (1521455263322734592,ClusteringInstance(1,0,false,4,(34.778023,32.073889),[6.0,7.0]))
     //    (1521455263322734592,ClusteringInstance(1,0,false,4,(34.775628,32.074032),[5.0,5.0]))
@@ -168,13 +159,6 @@ class DataPartitionerS2Test extends FlatSpec{
     collectedPartitionedData.filter(_._1==1521455269765185536L).size should equal (5)
     collectedPartitionedData.filter(_._1==1521455269765185536L).map(_._2.features(0)) should
       contain theSameElementsAs (List(3.0, 6.0, 8.0, 10.0, 11.0))
-    //    //Hashmonaim melchet cell
-    //    (1521455261175250944,ClusteringInstance(1,0,false,4,(34.777112,32.0718015),[8.0,9.0]))
-    //    (1521455261175250944,ClusteringInstance(1,0,false,4,(34.777547,32.072729),[11.0,2.0]))
-    //    (1521455261175250944,ClusteringInstance(1,0,false,4,(34.777558,32.072565),[3.0,4.0]))
-    collectedPartitionedData.filter(_._1==1521455261175250944L).size should equal (3)
-    collectedPartitionedData.filter(_._1==1521455261175250944L).map(_._2.features(0)) should
-      contain theSameElementsAs (List(3.0, 8.0, 11.0))
     //    //ahad ha'am cell
     //    (1521455259027767296,ClusteringInstance(1,0,false,4,(34.777112,32.0718015),[8.0,9.0]))
     //    (1521455259027767296,ClusteringInstance(1,0,false,4,(34.777547,32.072729),[11.0,2.0]))

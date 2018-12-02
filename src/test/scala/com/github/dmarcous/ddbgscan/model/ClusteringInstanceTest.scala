@@ -9,6 +9,7 @@ class ClusteringInstanceTest extends FlatSpec{
   val recordId = 1L
   val cluster = 1L
   val isVisited = true
+  val isInExpandedGeom = false
   val instanceStatus = ClusteringInstanceStatusValue.CORE.value
   val lonLatLocation = (34.779624, 32.073051)
   val features = Vectors.dense(1.0,2.0,3.0)
@@ -21,6 +22,7 @@ class ClusteringInstanceTest extends FlatSpec{
         recordId,
         cluster,
         isVisited,
+        isInExpandedGeom,
         instanceStatus,
         lonLatLocation,
         features
@@ -29,6 +31,7 @@ class ClusteringInstanceTest extends FlatSpec{
     instance.recordId should equal(recordId)
     instance.cluster should equal(cluster)
     instance.isVisited should equal(isVisited)
+    instance.isInExpandedGeom should equal(isInExpandedGeom)
     instance.instanceStatus should equal(instanceStatus)
     instance.lonLatLocation should equal(lonLatLocation)
     instance.features should equal(features)
@@ -47,6 +50,7 @@ class ClusteringInstanceTest extends FlatSpec{
     instance.recordId should equal(recordId)
     instance.cluster should equal(UNKNOWN_CLUSTER)
     instance.isVisited should equal(false)
+    instance.isInExpandedGeom should equal(true)
     instance.instanceStatus should equal(ClusteringInstanceStatusValue.UNKNOWN.value)
     instance.lonLatLocation should equal(lonLatLocation)
     instance.features should equal(emptyFeatures)

@@ -5,7 +5,7 @@ import com.github.dmarcous.ddbgscan.core.config.CoreConfig.{DEFAULT_GEO_FILE_DEL
 case class IOConfig(
    inputPath : String,
    outputFolderPath : String,
-   positionId: Int = NO_UNIQUE_ID_FIELD,
+   positionId: Int = NO_UNIQUE_ID_FIELD, // Should include unique long values
    positionLon: Int = DEFAULT_LONGITUDE_POSITION_FIELD_NUMBER,
    positionLat: Int = DEFAULT_LATITUDE_POSITION_FIELD_NUMBER,
    inputDelimiter : String = DEFAULT_GEO_FILE_DELIMITER

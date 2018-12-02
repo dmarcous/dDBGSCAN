@@ -33,9 +33,9 @@ Further details in paper : TBD
 
 ## Requirements
 
-Spark 2.2+.
+Spark 2.3.+
 
-Scala 2.11.
+Scala 2.11.+
 
 ## Usage
 
@@ -44,6 +44,9 @@ Scala 2.11.
 ```scala
 // import 
 import com.github.dmarcous.ddbgscan.core.dDBGSCAN
+
+// Setup - make sure to have spark checkpoint dir set
+spark.sparkContext.setCheckpointDir("/tmp")
 
 // Run clustering
 println("Starting clustering...")

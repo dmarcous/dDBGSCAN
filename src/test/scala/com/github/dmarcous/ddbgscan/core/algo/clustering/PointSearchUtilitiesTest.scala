@@ -58,7 +58,7 @@ class PointSearchUtilitiesTest extends FlatSpec{
       spark, defaultLonLatDelimitedGeoData, S2_LVL, ioConfig
     )
   val partitionedData = DataPartitionerS2.partitionData(spark, clusteringDataset, epsilon, S2_LVL)
-  val instances = partitionedData.flatMapGroups((key, vals) => (vals.toList)).collect().toList.distinct
+  val instances = partitionedData.filter(_._1==1521455263322734592L).flatMap(_._2.toList).collect().toList.distinct
 
   "buildPointGeometrySearchTree" should "build a search tree from clustering instances" in
   {
@@ -66,7 +66,7 @@ class PointSearchUtilitiesTest extends FlatSpec{
 
     println(instances.length)
     println(searchTree.asString())
-    searchTree.size() should equal(6)
+    searchTree.size() should equal(5)
     val nearest = searchTree.nearest(Geometries.pointGeographic(34.777113,32.0718014),30,3)
     val nearList = nearest.toBlocking.toIterable.asScala.map{case(entry) => entry.value().lonLatLocation}.toList
     nearList should contain theSameElementsAs List(
@@ -80,7 +80,7 @@ class PointSearchUtilitiesTest extends FlatSpec{
     val treeInstances = PointSearchUtilities.getClusteringInstancesFromSearchTree(searchTree)
     treeInstances.map(_.lonLatLocation) should contain theSameElementsAs List(
       (34.777112,32.0718015), (34.777547,32.072729), (34.777558,32.072565),
-      (34.778023,32.073889), (34.778137,32.074229), (34.775628,32.074032)
+      (34.778023,32.073889), (34.775628,32.074032)
     )
   }
 
@@ -108,12 +108,12 @@ class PointSearchUtilitiesTest extends FlatSpec{
   {
     val searchTree = PointSearchUtilities.buildPointGeometrySearchTree(instances)
     val reachableInstances = PointSearchUtilities.getGeoDensityReachablePointsFromSearchTree(
-      searchTree, Geometries.pointGeographic(34.778083,32.074032), 40)
+      searchTree, Geometries.pointGeographic(34.777548,32.072729), 40)
 
     reachableInstances.foreach(println)
     reachableInstances.length should equal(2)
     reachableInstances.map(instance => (instance.geometry().x(), instance.geometry().y())) should contain theSameElementsAs List(
-      (34.778023,32.073889), (34.778137,32.074229)
+      (34.777547,32.072729), (34.777558,32.072565)
     )
   }
 

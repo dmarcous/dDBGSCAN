@@ -6,7 +6,7 @@ import com.github.dmarcous.ddbgscan.core.config.AlgorithmParameters
 import com.github.dmarcous.ddbgscan.core.config.CoreConfig.ClusteringInstanceStatusValue.{BORDER, CORE, NOISE}
 import com.github.dmarcous.ddbgscan.core.config.CoreConfig.UNKNOWN_CLUSTER
 import com.github.dmarcous.ddbgscan.model.ClusteringInstance
-import org.apache.spark.sql.{Dataset, KeyValueGroupedDataset, SparkSession}
+import org.apache.spark.sql.{Dataset, SparkSession}
 
 import scala.collection.JavaConverters._
 import scala.collection.mutable.Queue
@@ -14,27 +14,26 @@ import scala.collection.mutable.Queue
 object DataGeoClusterer {
 
   def clusterGeoData(@transient spark: SparkSession,
-                     data: KeyValueGroupedDataset[Long, ClusteringInstance],
+                     data: Dataset[(Long, List[ClusteringInstance])],
                      parameters: AlgorithmParameters
                     ): Dataset[(Long, List[ClusteringInstance])]  =
   {
     import spark.implicits._
 
     val clusteredData =
-      data.mapGroups{case(key, vals) => (key,DataGeoClusterer.clusterLocalGeoData(key, vals, parameters))}
+      data.map{case(key, vals) => (key,DataGeoClusterer.clusterLocalGeoData(key, vals, parameters))}
 
     clusteredData
   }
 
   def clusterLocalGeoData(
                      geoKey: Long,
-                     data: Iterator[ClusteringInstance],
+                     instances: List[ClusteringInstance],
                      parameters: AlgorithmParameters
          ): List[ClusteringInstance] =
   {
-    var currentCluster = UNKNOWN_CLUSTER + 1
+    var currentCluster = UNKNOWN_CLUSTER
 
-    val instances = data.toList
     val searchTree = PointSearchUtilities.buildPointGeometrySearchTree(instances)
     searchTree.entries().toBlocking().toIterable.asScala.foreach{
       // point - same p as in DBSCAN original implementation
@@ -50,22 +49,21 @@ object DataGeoClusterer {
             parameters.epsilon, searchTree, parameters.isNeighbourInstances)
 
           // Noise - not enough neighbours
-          if (neighbours.size < parameters.minPts)
+          if (neighbours.size + 1 < parameters.minPts)
           {
             p.value().instanceStatus = NOISE.value
           }
           // Current point is part of a cluster
           else
           {
+            currentCluster = p.value().recordId // Use recordId to have clusters globally unique
+
             // Create a cluster for point p and mark it as a core point
             p.value().cluster = currentCluster
             p.value().instanceStatus = CORE.value
 
             // Iterate over neighbours (in DBSCAN article called "Expand the cluster)
             expandCluster(neighbours, searchTree, currentCluster, parameters)
-
-            // Advance cluster id
-            currentCluster += 1
           }
         }// traverse unvisited points
       }
@@ -102,7 +100,7 @@ object DataGeoClusterer {
           val nbhdQ = NeighbourUtilities.getNeighbours(q,
             parameters.epsilon, searchTree, parameters.isNeighbourInstances)
           // Check if q has enough neighbours to be part of a cluster
-          if (nbhdQ.size >= parameters.minPts)
+          if (nbhdQ.size + 1 >= parameters.minPts)
           {
             // Set as a core point
             q.value().instanceStatus = CORE.value
@@ -118,6 +116,7 @@ object DataGeoClusterer {
         // Neighbour already visited and marked as noise
         else if (q.value().instanceStatus == NOISE.value)
         {
+          // I'm not directly reachable to minPts , but together with my neighbour's neighbours I am.
           // Change previous assignment to border - as we now know that it is part of our cluster (q is reachable from p)
           q.value().cluster = currentCluster
           q.value().instanceStatus = BORDER.value

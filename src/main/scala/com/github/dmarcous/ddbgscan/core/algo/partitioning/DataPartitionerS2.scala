@@ -15,18 +15,40 @@ object DataPartitionerS2 {
                     data: Dataset[(KeyGeoEntity, ClusteringInstance)],
                     epsilon: Double,
                     neighborhoodPartitioningLvl : Int
-         ): KeyValueGroupedDataset[Long, ClusteringInstance] =
+         ): Dataset[(Long, List[ClusteringInstance])] =
   {
     import spark.implicits._
 
-    val cellReachableData = data.map{case(key, instance) =>
-      // Using data from instance instead of key for safe conversion (key isn't redundant as its used for input validation)
-      (DataPartitionerS2.getDensityReachableCells(
-        instance.lonLatLocation._1, instance.lonLatLocation._2, neighborhoodPartitioningLvl, epsilon), instance)}
-    val keyValData = cellReachableData.flatMap{case(cells, instance) => cells.map{case(cellId) => (cellId, instance)}}
-    val groupedData = keyValData.groupByKey(_._1).mapValues(_._2)
+    val cellReachableData =
+      data
+        // Using data from instance instead of key for safe conversion
+        // (key isn't redundant as its used for inner /outer partitioning input validation)
+        .map{case(key, instance) =>
+          (key.s2CellId,
+           DataPartitionerS2.getDensityReachableCells(
+           instance.lonLatLocation._1, instance.lonLatLocation._2, neighborhoodPartitioningLvl, epsilon),
+           instance)}
 
-    groupedData
+    // Key by expanded cell
+    val keyValData =
+      cellReachableData
+        .flatMap{case(originalCellId, cells, instance) =>
+          cells.map{case(expandedCellId) => (expandedCellId,
+            instance.copy(isInExpandedGeom = expandedCellId != originalCellId)
+          )}
+        }
+
+    // Remove cells that don't have any inner points (no original data)
+    val reducedSizeData =
+      keyValData
+        .groupByKey(_._1) // group by expanded cell
+        .mapValues(_._2) // remove redundant inner id
+        // Sum number of inner instances
+        .mapGroups{case(cellId,instances)=>
+          (cellId,instances.toList)}
+        .filter(!_._2.map(_.isInExpandedGeom).foldLeft(true)(_ && _)) // Keep only cells with at least 1 inner instance
+
+    reducedSizeData
   }
 
   def getDensityReachableCells(pointGeoKey: KeyGeoEntity, epsilon: Double): List[Long] =
