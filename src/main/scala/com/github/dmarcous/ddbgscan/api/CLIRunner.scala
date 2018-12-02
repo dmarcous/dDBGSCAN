@@ -90,7 +90,6 @@ object CLIRunner {
       System.exit(1)
     }
 
-
     println("inputPath : " + inputPath)
     println("positionFieldId : " + positionFieldId)
     println("positionFieldLon : " + positionFieldLon)
