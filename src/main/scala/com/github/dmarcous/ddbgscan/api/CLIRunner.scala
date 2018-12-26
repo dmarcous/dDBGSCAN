@@ -1,15 +1,13 @@
 package com.github.dmarcous.ddbgscan.api
 
 import com.github.dmarcous.ddbgscan.core.config.CoreConfig._
-import com.github.dmarcous.ddbgscan.core.algo.dDBGSCAN
 import com.github.dmarcous.ddbgscan.core.config.{AlgorithmParameters, IOConfig}
-import com.github.dmarcous.ddbgscan.core.preprocessing.GeoPropertiesExtractor
 import org.apache.spark.ml.linalg.Vector
 import org.apache.spark.sql.SparkSession
 
 object CLIRunner {
 
-  def main(args: Array[String])
+  def main(args: Array[String]) :Unit =
   {
     // Create spark context
     val appName="dDBGSCAN"
@@ -19,34 +17,10 @@ object CLIRunner {
         .appName(appName)
         .getOrCreate()
 
-    // Setup - make sure to have spark checkpoint dir set for graphframes connected components algorithm
-    spark.sparkContext.setCheckpointDir("/tmp")
-
     val conf = parseArgs(args)
 
-    // Read input file
-    val data =
-      spark.read
-        .textFile(conf.ioConfig.inputPath)
-
-    // Extract geo data from input and keep rest
-    val clusteringData =
-      GeoPropertiesExtractor.fromLonLatDelimitedFile(
-        spark,
-        data,
-        conf.parameters.neighborhoodPartitioningLvl,
-        conf.ioConfig)
-
-    // Run GloVe
-    println("Starting clustering...")
-    val results =
-      dDBGSCAN.run(spark, clusteringData,
-        conf.parameters)
-
-    // Write output
-    println("Writing results...")
-    results.write
-      .csv(conf.ioConfig.outputFolderPath)
+    // Run clustering main flow algorithm
+    dDBGSCANRunner.run(spark, conf)
   }
 
   def parseArgs(args: Array[String]) : RuntimeConfig = {
