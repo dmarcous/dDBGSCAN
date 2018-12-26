@@ -42,6 +42,64 @@ Scala 2.11.+
 ### Scala API
 
 ```scala
+import com.github.dmarcous.ddbgscan.api.RuntimeConfig
+import com.github.dmarcous.ddbgscan.api.dDBGSCANRunner
+import com.github.dmarcous.ddbgscan.core.config.CoreConfig._
+import com.github.dmarcous.ddbgscan.core.config.{AlgorithmParameters, IOConfig}
+import java.io.File
+import org.apache.commons.io.FileUtils
+import org.apache.spark.sql.SparkSession
+
+// Spark settings
+val spark =
+  SparkSession
+    .builder()
+    // .master("local") - set this only for testing on your local machine
+    .appName("dDBGSCANRunner")
+    .getOrCreate()
+
+// Run conf
+val epsilon = 100.0
+val minPts = 3
+val neighborhoodPartitioningLvl = 15
+val isNeighbourInstances = DEFAULT_NEIGHBOUR_SIMILARITY_EXTENSION_FUNCTION
+val parameters = AlgorithmParameters(
+epsilon,
+minPts,
+neighborhoodPartitioningLvl,
+isNeighbourInstances
+)
+val inputPath = "./src/test/resources/complexLonLatDelimitedGeoData.csv"
+val outputFolderPath = "/tmp/dDBGSCAN/"
+val positionId = 0
+val positionLon = DEFAULT_LONGITUDE_POSITION_FIELD_NUMBER+1
+val positionLat = DEFAULT_LATITUDE_POSITION_FIELD_NUMBER+1
+val delimiter = DEFAULT_GEO_FILE_DELIMITER
+val ioConfig = IOConfig(
+inputPath,
+outputFolderPath,
+positionId,
+positionLon,
+positionLat,
+delimiter
+)
+val conf =
+RuntimeConfig(
+  ioConfig,
+  parameters
+)
+
+// Clean output before run if necessary
+FileUtils.deleteQuietly(new File(outputFolderPath))
+
+// Run algorithm (preprocess, cluster, write results)
+dDBGSCANRunner.run(spark, conf)
+
+```
+
+### Scala Advanced Usage API
+
+```scala
 import com.github.dmarcous.ddbgscan.core.config.CoreConfig.ClusteringInstanceStatusValue.{BORDER, CORE, NOISE}
 import com.github.dmarcous.ddbgscan.core.config.CoreConfig._
 import com.github.dmarcous.ddbgscan.core.config.{AlgorithmParameters, IOConfig}
@@ -54,7 +112,7 @@ val spark =
 SparkSession
   .builder()
   // .master("local") - set this only for testing on your local machine
-  .appName("dDBGSCANTest")
+  .appName("dDBGSCANAdvancedUsage")
   .getOrCreate()
 import spark.implicits._
 // Important for merging phase (connected components) to work
@@ -118,6 +176,9 @@ GeoPropertiesExtractor.fromLonLatDelimitedFile(
 // Run clustering algorithm
 val globallyClusteredData =
   dDBGSCAN.run(spark, clusteringDataset, params)
+
+// Possible do something with results like writing to CSV
+globallyClusteredData.write.csv(outputFolderPath)
 
 ```
 

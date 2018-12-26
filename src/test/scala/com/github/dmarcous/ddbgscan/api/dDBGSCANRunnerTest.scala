@@ -39,8 +39,7 @@ class dDBGSCANRunnerTest extends FlatSpec{
       ioConfig,
       parameters
     )
-
-
+  
   "run" should "run full dDBGSCAN pipeline " in
   {
     // Create outside test so test will get it from here
@@ -48,7 +47,7 @@ class dDBGSCANRunnerTest extends FlatSpec{
       SparkSession
         .builder()
         .master("local")
-        .appName("CLIRunnerTest")
+        .appName("dDBGSCANRunnerTest")
         .getOrCreate()
 
     // Clean output before run
