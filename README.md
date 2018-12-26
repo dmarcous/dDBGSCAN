@@ -12,8 +12,8 @@ Further details in paper : TBD
 
   1. Partitioning using S2cell units
   2. Local clustering using DBSCAN with r*-tree
-  3. Global merging using graph label propagation
-
+  3. Global merging using graph(frames) connected components
+s
 ### Parameters
 
   1. Epsilon (ε) - maximal meters distance between points to be defined as “density

@@ -148,14 +148,14 @@ object ClusterMerger {
 
     val globallyClusteredData =
       globalClusterMapping
-          .map{case(instance, clusterMapping) => (
+          .map{case(instance, clusterMapping) =>
             ClusteredInstance(
               recordId=instance._1,
               // Take global merged cluster if exists
               cluster=(if(clusterMapping != null) clusterMapping._2 else instance._2),
               instanceStatus=instance._3
             )
-          )}
+          }
 
     globallyClusteredData
   }
