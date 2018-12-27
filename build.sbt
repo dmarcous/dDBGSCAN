@@ -12,10 +12,10 @@ resolvers ++= Seq(
 
 // Spark
 libraryDependencies ++= Seq(
-  "org.apache.spark"      %% "spark-core"       % sparkVersion,
-  "org.apache.spark"      %% "spark-sql"        % sparkVersion,
-  "org.apache.spark"      %% "spark-mllib"      % sparkVersion,
-  "org.apache.spark"      %% "spark-graphx"     % sparkVersion
+  "org.apache.spark"      %% "spark-core"       % sparkVersion % "provided",
+  "org.apache.spark"      %% "spark-sql"        % sparkVersion % "provided",
+  "org.apache.spark"      %% "spark-mllib"      % sparkVersion % "provided",
+  "org.apache.spark"      %% "spark-graphx"     % sparkVersion % "provided"
 )
 // Spark GraphFrames
 libraryDependencies += "graphframes" % "graphframes" % "0.6.0-spark2.3-s_2.11"
@@ -41,3 +41,7 @@ developers := List(Developer("dmarcous",
   "dmarcous@gmail.com",
   url("https://github.com/dmarcous")))
 licenses += ("Apache-2.0", url("http://www.apache.org/licenses/LICENSE-2.0"))
+
+// Assembly for fat jar (EMR ready) settings
+assemblyOption in assembly := (assemblyOption in assembly).value.copy(includeScala = false)
+assemblyJarName in assembly := s"${name.value}_${scalaBinaryVersion.value}-${sparkVersion}_${version.value}.jar"
