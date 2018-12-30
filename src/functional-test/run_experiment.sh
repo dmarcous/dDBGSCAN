@@ -5,12 +5,14 @@
 # --input_remote_dir
 # --output_remote_dir
 # --experiment_index
+# --local_exp_dir
 
 # Experiment setup
 MINPTS=20
 EPSILON=10
 
 # Set args defaults
+LOCAL="/mnt/experiments/"
 INPUT_REMOTE="s3://mybucket/data/"
 OUTPUT_REMOTE="s3://mybucket/output/"
 PARTITION_LVL=15
@@ -38,6 +40,10 @@ shift
 INDEX="${i#*=}"
 shift
 ;;
+--local_exp_dir=*)
+LOCAL="${i#*=}"
+shift
+;;
 -*)
 # do not exit out, just note failure
 echo "unrecognized option: ${i#*=}"
@@ -51,13 +57,13 @@ done
 echo 'Running with parameters : '
 echo "INPUT_REMOTE = ${INPUT_REMOTE}"
 echo "OUTPUT_REMOTE = ${OUTPUT_REMOTE}"
+echo "LOCAL = ${LOCAL}"
 echo "PARTITION_LVL = ${PARTITION_LVL}"
 echo "MINPTS = ${MINPTS}"
 echo "EPSILON = ${EPSILON}"
 echo "INDEX = ${INDEX}"
 
 # Set useful variables
-LOCAL="/mnt/experiments"
 JAR_PATH="/resources/jar/dDBGSCAN_2.11-2.3.2_1.0.0.jar"
 CURRENT_EXP_OUTPUT=$OUTPUT_REMOTE/dDBGSCAN/part_$PARTITION_LVL/exp_$INDEX/
 
