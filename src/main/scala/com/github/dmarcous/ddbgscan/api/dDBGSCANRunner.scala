@@ -8,8 +8,10 @@ object dDBGSCANRunner {
 
   def run(@transient spark: SparkSession, conf: RuntimeConfig) :Unit =
   {
-    // Setup - make sure to have spark checkpoint dir set for graphframes connected components algorithm
-    spark.sparkContext.setCheckpointDir("/tmp")
+    // Setup
+    spark.sparkContext.setCheckpointDir("/tmp") // make sure to have spark checkpoint dir set for graphframes connected components algorithm
+    spark.conf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer") // Fast serialisation of objects
+    spark.sql("set spark.sql.shuffle.partitions="+conf.ioConfig.numPartitions.toString)
 
     // Read input file
     val data =

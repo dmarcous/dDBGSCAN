@@ -49,13 +49,15 @@ class dDBGSCANTest extends FlatSpec{
   val positionLon = DEFAULT_LONGITUDE_POSITION_FIELD_NUMBER+1
   val positionLat = DEFAULT_LATITUDE_POSITION_FIELD_NUMBER+1
   val delimiter = DEFAULT_GEO_FILE_DELIMITER
+  val numPartitions = 1
   val ioConfig = IOConfig(
     inputPath,
     outputFolderPath,
     positionId,
     positionLon,
     positionLat,
-    delimiter
+    delimiter,
+    numPartitions
   )
 
   val minPts = 3

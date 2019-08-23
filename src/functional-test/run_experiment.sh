@@ -6,6 +6,8 @@
 # --output_remote_dir
 # --experiment_index
 # --local_exp_dir
+# --parallelism
+# --numPartitions
 
 # Experiment setup
 MINPTS=20
@@ -17,6 +19,8 @@ INPUT_REMOTE="s3://mybucket/data/"
 OUTPUT_REMOTE="s3://mybucket/output/"
 PARTITION_LVL=15
 INDEX=0
+PARALLELISM=256
+NUM_PARTITIONS=256
 
 # Read params
 echo 'Reading script params...'
@@ -44,6 +48,14 @@ shift
 LOCAL="${i#*=}"
 shift
 ;;
+--parallelism=*)
+PARALLELISM="${i#*=}"
+shift
+;;
+--numPartitions=*)
+NUM_PARTITIONS="${i#*=}"
+shift
+;;
 -*)
 # do not exit out, just note failure
 echo "unrecognized option: ${i#*=}"
@@ -62,13 +74,15 @@ echo "PARTITION_LVL = ${PARTITION_LVL}"
 echo "MINPTS = ${MINPTS}"
 echo "EPSILON = ${EPSILON}"
 echo "INDEX = ${INDEX}"
+echo "PARALLELISM = ${PARALLELISM}"
+echo "NUM_PARTITIONS = ${NUM_PARTITIONS}"
 
 # Set useful variables
-JAR_PATH="/resources/jar/dDBGSCAN_2.11-2.3.2_1.0.0.jar"
+JAR_PATH="/resources/jar/dDBGSCAN_2.11-2.4.3_1.0.0.jar"
 CURRENT_EXP_OUTPUT=$OUTPUT_REMOTE/dDBGSCAN/part_$PARTITION_LVL/exp_$INDEX/
 
 echo "Preparing run cmd"
-RUN_CMD="/usr/lib/spark/bin/spark-submit --class com.github.dmarcous.ddbgscan.api.CLIRunner --driver-java-options='-Dspark.yarn.app.container.log.dir=/mnt/var/log/hadoop' --conf spark.default.parallelism=64 ${LOCAL}${JAR_PATH} --inputFilePath ${INPUT_REMOTE} --outputFolderPath ${CURRENT_EXP_OUTPUT} --positionFieldId 0 --positionFieldLon 1 --positionFieldLat 2 --inputFieldDelimiter , --epsilon ${EPSILON} --minPts ${MINPTS} --neighborhoodPartitioningLvl ${PARTITION_LVL}"
+RUN_CMD="/usr/lib/spark/bin/spark-submit --class com.github.dmarcous.ddbgscan.api.CLIRunner --driver-java-options='-Dspark.yarn.app.container.log.dir=/mnt/var/log/hadoop' --conf spark.default.parallelism=${PARALLELISM} ${LOCAL}${JAR_PATH} --inputFilePath ${INPUT_REMOTE} --outputFolderPath ${CURRENT_EXP_OUTPUT} --positionFieldId 0 --positionFieldLon 1 --positionFieldLat 2 --inputFieldDelimiter , --numPartitions ${NUM_PARTITIONS} --epsilon ${EPSILON} --minPts ${MINPTS} --neighborhoodPartitioningLvl ${PARTITION_LVL}"
 echo ${RUN_CMD}
 
 echo "Starting run"

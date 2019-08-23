@@ -20,8 +20,17 @@ object DataGeoClusterer {
   {
     import spark.implicits._
 
+//    val clusteredData =
+//      data.map{case(key, vals) => (key, DataGeoClusterer.clusterLocalGeoData(key, vals, parameters))}
+
     val clusteredData =
-      data.map{case(key, vals) => (key,DataGeoClusterer.clusterLocalGeoData(key, vals, parameters))}
+      data.mapPartitions//[(Long, List[ClusteringInstance])]
+        {partition => {
+          partition.map { case (key, vals) =>
+            (key, DataGeoClusterer.clusterLocalGeoData(key, vals, parameters))
+          }
+        }
+      }
 
     clusteredData
   }

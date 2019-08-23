@@ -30,6 +30,9 @@ object CoreConfig {
         )
     .withDefaultValue(DEFAULT_NEIGHBOUR_SIMILARITY_EXTENSION_FUNCTION)
 
+  // Tuning parameters
+  val DEFAULT_NUM_PARTITIONS = 256
+
   // Clustering instance properties
   val UNKNOWN_CLUSTER = -1L
 

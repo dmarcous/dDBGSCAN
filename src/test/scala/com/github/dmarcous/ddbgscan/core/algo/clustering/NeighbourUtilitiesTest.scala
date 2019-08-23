@@ -45,13 +45,15 @@ class NeighbourUtilitiesTest extends FlatSpec{
   val positionLon = DEFAULT_LONGITUDE_POSITION_FIELD_NUMBER
   val positionLat = DEFAULT_LATITUDE_POSITION_FIELD_NUMBER
   val delimiter = DEFAULT_GEO_FILE_DELIMITER
+  val numPartitions = 1
   val ioConfig = IOConfig(
     inputPath,
     outputFolderPath,
     positionId,
     positionLon,
     positionLat,
-    delimiter
+    delimiter,
+    numPartitions
   )
 
   val clusteringDataset =

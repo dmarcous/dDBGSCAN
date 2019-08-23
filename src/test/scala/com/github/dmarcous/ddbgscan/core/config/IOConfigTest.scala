@@ -11,6 +11,7 @@ class IOConfigTest extends FlatSpec{
   val positionLon = DEFAULT_LONGITUDE_POSITION_FIELD_NUMBER
   val positionLat = DEFAULT_LATITUDE_POSITION_FIELD_NUMBER
   val delimiter = DEFAULT_GEO_FILE_DELIMITER
+  val numPartitions = DEFAULT_NUM_PARTITIONS
 
   "Full constructor" should "return a valid object" in
   {
@@ -21,7 +22,8 @@ class IOConfigTest extends FlatSpec{
         positionId,
         positionLon,
         positionLat,
-        delimiter
+        delimiter,
+        numPartitions
       )
 
     params.inputPath should equal (inputPath)
@@ -30,6 +32,7 @@ class IOConfigTest extends FlatSpec{
     params.positionLon should equal (positionLon)
     params.positionLat should equal (positionLat)
     params.inputDelimiter should equal (delimiter)
+    params.numPartitions should equal (numPartitions)
 
   }
 
@@ -47,6 +50,7 @@ class IOConfigTest extends FlatSpec{
     params.positionLon should equal (DEFAULT_LONGITUDE_POSITION_FIELD_NUMBER)
     params.positionLat should equal (DEFAULT_LATITUDE_POSITION_FIELD_NUMBER)
     params.inputDelimiter should equal (DEFAULT_GEO_FILE_DELIMITER)
+    params.numPartitions should equal (DEFAULT_NUM_PARTITIONS)
 
   }
 

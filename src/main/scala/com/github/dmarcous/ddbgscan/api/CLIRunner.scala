@@ -31,6 +31,7 @@ object CLIRunner {
     [--positionFieldId int] [--positionFieldLon int] [--positionFieldLat int]
     [--inputFieldDelimiter int]
     [--neighborhoodPartitioningLvl int] [--isNeighbourInstances_function_code int]
+    [--numPartitions int]
     """
 
     var inputPath : String = ""
@@ -43,6 +44,7 @@ object CLIRunner {
     var inputFieldDelimiter : String = DEFAULT_GEO_FILE_DELIMITER
     var neighborhoodPartitioningLvl : Int = MISSING_NEIGHBORHOOD_LVL
     var isNeighbourInstances : (Vector, Vector) => Boolean = DEFAULT_NEIGHBOUR_SIMILARITY_EXTENSION_FUNCTION
+    var numPartitions : Int = DEFAULT_NUM_PARTITIONS
 
     args.sliding(2, 2).toList.collect{
       case Array("--inputFilePath", argInputFilePath: String) => inputPath = argInputFilePath
@@ -55,6 +57,7 @@ object CLIRunner {
       case Array("--minPts", argMinPts: String) => minPts = argMinPts.toInt
       case Array("--neighborhoodPartitioningLvl", argNeighborhoodPartitioningLvl: String) => neighborhoodPartitioningLvl = argNeighborhoodPartitioningLvl.toInt
       case Array("--isNeighbourInstances_function_code", argIsNeighbourInstances_function_code: String) => isNeighbourInstances = NEIGHBOUR_SIMILARITY_EXTENSION_FUNCTION_TRANSLATOR(argIsNeighbourInstances_function_code.toInt)
+      case Array("--numPartitions", argNumPartitions: String) => numPartitions = argNumPartitions.toInt
     }
 
     // Make sure all mandatory params are in place
@@ -74,6 +77,7 @@ object CLIRunner {
     println("minPts : " + minPts)
     println("neighborhoodPartitioningLvl : " + neighborhoodPartitioningLvl)
     println("isNeighbourInstances function code : " + isNeighbourInstances.toString())
+    println("numPartitions : " + numPartitions)
 
     RuntimeConfig(
       IOConfig(
@@ -82,7 +86,8 @@ object CLIRunner {
         positionFieldId,
         positionFieldLon,
         positionFieldLat,
-        inputFieldDelimiter
+        inputFieldDelimiter,
+        numPartitions
       ),
       AlgorithmParameters(
         epsilon,

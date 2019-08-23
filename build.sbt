@@ -4,7 +4,7 @@ version := "1.0.0"
 
 scalaVersion := "2.11.8"
 
-val sparkVersion = "2.3.2"
+val sparkVersion = "2.4.3"
 
 resolvers ++= Seq(
   "All Spark Repository -> bintray-spark-packages" at "https://dl.bintray.com/spark-packages/maven/"
@@ -18,7 +18,7 @@ libraryDependencies ++= Seq(
   "org.apache.spark"      %% "spark-graphx"     % sparkVersion % "provided"
 )
 // Spark GraphFrames
-libraryDependencies += "graphframes" % "graphframes" % "0.6.0-spark2.3-s_2.11"
+libraryDependencies += "graphframes" % "graphframes" % "0.7.0-spark2.4-s_2.11"
 
 // S2 utils
 libraryDependencies += "com.github.dmarcous" %% "s2utils" % "1.1.1"

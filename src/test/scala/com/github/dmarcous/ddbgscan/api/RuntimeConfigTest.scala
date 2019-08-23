@@ -23,13 +23,15 @@ class RuntimeConfigTest extends FlatSpec{
   val positionLon = DEFAULT_LONGITUDE_POSITION_FIELD_NUMBER
   val positionLat = DEFAULT_LATITUDE_POSITION_FIELD_NUMBER
   val delimiter = DEFAULT_GEO_FILE_DELIMITER
+  val numPartitions = DEFAULT_NUM_PARTITIONS
   val ioConfig = IOConfig(
     inputPath,
     outputFolderPath,
     positionId,
     positionLon,
     positionLat,
-    delimiter
+    delimiter,
+    numPartitions
   )
 
   "Full constructor" should "return a valid object" in
@@ -65,6 +67,7 @@ class RuntimeConfigTest extends FlatSpec{
     conf.ioConfig.positionLon should equal (positionLon)
     conf.ioConfig.positionLat should equal (positionLat)
     conf.ioConfig.inputDelimiter should equal (delimiter)
+    conf.ioConfig.numPartitions should equal (numPartitions)
     conf.parameters.epsilon should equal(epsilon)
     conf.parameters.minPts should equal(minPts)
     conf.parameters.neighborhoodPartitioningLvl should equal(completedNeighborhoodPartitioningLvl)

@@ -48,7 +48,16 @@ object DataPartitionerS2 {
           (cellId,instances.toList)}
         .filter(!_._2.map(_.isInExpandedGeom).foldLeft(true)(_ && _)) // Keep only cells with at least 1 inner instance
 
-    reducedSizeData
+    // TODO : perhaps return that
+//    val repartitionedData = reducedSizeData
+    val repartitionedData =
+      reducedSizeData
+        .repartitionByRange(partitionExprs=$"_1") // Partition by cell id
+
+    // Trigger shuffle for repartitioning to happen
+    repartitionedData.count()
+
+    repartitionedData
   }
 
   def getDensityReachableCells(pointGeoKey: KeyGeoEntity, epsilon: Double): List[Long] =

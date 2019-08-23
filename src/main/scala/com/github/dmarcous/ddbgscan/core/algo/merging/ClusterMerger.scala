@@ -16,15 +16,27 @@ object ClusterMerger {
     val instanceStateData: Dataset[(Long, Long, Int, Boolean, List[Long])] =
       computeInstanceState(spark, clusteredData)
 
+    //TODO: delete this debug print
+    println("locallyClusteredData stage 3.0 --- " + instanceStateData.count().toString)
+
     // Get merge candidates (edge list of connected clusters)
     val mergeClusterEdgeList: DataFrame =
       extractMergeCandidates(spark, instanceStateData)
 
+    //TODO: delete this debug print
+    println("mergeClusterEdgeList stage 3.1 --- " + mergeClusterEdgeList.count().toString)
+
     val mergedClustersToOriginalClustersMapping =
       mergeClusters(spark, mergeClusterEdgeList)
 
+    //TODO: delete this debug print
+    println("mergedClustersToOriginalClustersMapping stage 3.2 --- " + mergedClustersToOriginalClustersMapping.count().toString)
+
     val globallyClusteredData =
       createGlobalClusterMapping(spark, instanceStateData, mergedClustersToOriginalClustersMapping)
+
+    //TODO: delete this debug print
+    println("globallyClusteredData stage 3.3 --- " + globallyClusteredData.count().toString)
 
     globallyClusteredData
   }
