@@ -11,7 +11,7 @@
 
 # Experiment setup
 MINPTS=20
-EPSILON=10
+EPSILON=40
 
 # Set args defaults
 LOCAL="/mnt/experiments/"
