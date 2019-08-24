@@ -10,6 +10,9 @@ resolvers ++= Seq(
   "All Spark Repository -> bintray-spark-packages" at "https://dl.bintray.com/spark-packages/maven/"
 )
 
+// Scala version override
+dependencyOverrides += "org.scala-lang" % "scala-compiler" % scalaVersion.value
+
 // Spark
 libraryDependencies ++= Seq(
   "org.apache.spark"      %% "spark-core"       % sparkVersion % "provided",
