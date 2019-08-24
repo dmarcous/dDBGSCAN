@@ -8,6 +8,8 @@
 # --local_exp_dir
 # --parallelism
 # --numPartitions
+# --minpts
+# --epsilon
 
 # Experiment setup
 MINPTS=20
@@ -54,6 +56,14 @@ shift
 ;;
 --numPartitions=*)
 NUM_PARTITIONS="${i#*=}"
+shift
+;;
+--minpts=*)
+MINPTS="${i#*=}"
+shift
+;;
+--epsilon=*)
+EPSILON="${i#*=}"
 shift
 ;;
 -*)

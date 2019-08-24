@@ -7,6 +7,7 @@ import com.github.davidmoten.rtree.geometry.{Geometries, Point, Rectangle}
 import com.github.davidmoten.rtree.{Entries, Entry, RTree}
 import com.github.dmarcous.ddbgscan.model.ClusteringInstance
 import rx.functions.Func1
+import scala.math.{min,max}
 
 import scala.collection.JavaConverters._
 
@@ -71,6 +72,11 @@ object PointSearchUtilities {
       val south = from.predict(distanceKm, 180)
       val east = from.predict(distanceKm, 90)
       val west = from.predict(distanceKm, 270)
-      Geometries.rectangle(west.getLon, south.getLat, east.getLon, north.getLat)
+      // validation for edge cases :
+      val x1 = min(west.getLon, east.getLon)
+      val x2 = max(west.getLon, east.getLon)
+      val y1 = min(south.getLat, north.getLat)
+      val y2 = max(south.getLat, north.getLat)
+      Geometries.rectangle(x1, y1, x2, y2)
     }
 }
