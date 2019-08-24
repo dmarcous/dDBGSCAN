@@ -21,7 +21,7 @@ libraryDependencies ++= Seq(
 libraryDependencies += "graphframes" % "graphframes" % "0.7.0-spark2.4-s_2.11"
 
 // S2 utils
-libraryDependencies += "com.github.dmarcous" %% "s2utils" % "1.1.1"
+libraryDependencies += "com.github.dmarcous" % "s2utils_2.11" % "1.1.1"
 
 // R*tree
 libraryDependencies += "com.github.davidmoten" % "rtree" % "0.8.4"
