@@ -17,7 +17,9 @@ class CLIRunnerTest extends FlatSpec{
   val parameters = AlgorithmParameters(
     epsilon,
     minPts,
+    GEO_PARTITIONING_STRATEGY,
     neighborhoodPartitioningLvl,
+    DEFAULT_NUM_PARTITIONS,
     isNeighbourInstances
   )
   val inputPath = "./src/test/resources/complexLonLatDelimitedGeoData.csv"

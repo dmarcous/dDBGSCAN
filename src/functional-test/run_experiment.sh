@@ -10,6 +10,9 @@
 # --numPartitions
 # --minpts
 # --epsilon
+# --partitioningStrategy
+# --debug
+# --maxPointsPerPartition
 
 # Experiment setup
 MINPTS=20
@@ -23,6 +26,9 @@ PARTITION_LVL=15
 INDEX=0
 PARALLELISM=256
 NUM_PARTITIONS=256
+PARTITIONING_STATEGY="S2"
+DEBUG="false"
+MAX_POINTS_PER_PARTITION=256
 
 # Read params
 echo 'Reading script params...'
@@ -66,6 +72,18 @@ shift
 EPSILON="${i#*=}"
 shift
 ;;
+--partitioningStrategy=*)
+PARTITIONING_STATEGY="${i#*=}"
+shift
+;;
+--debug=*)
+DEBUG="${i#*=}"
+shift
+;;
+--maxPointsPerPartition=*)
+MAX_POINTS_PER_PARTITION="${i#*=}"
+shift
+;;
 -*)
 # do not exit out, just note failure
 echo "unrecognized option: ${i#*=}"
@@ -86,13 +104,16 @@ echo "EPSILON = ${EPSILON}"
 echo "INDEX = ${INDEX}"
 echo "PARALLELISM = ${PARALLELISM}"
 echo "NUM_PARTITIONS = ${NUM_PARTITIONS}"
+echo "PARTITIONING_STATEGY = ${PARTITIONING_STATEGY}"
+echo "MAX_POINTS_PER_PARTITION = ${MAX_POINTS_PER_PARTITION}"
+echo "DEBUG = ${DEBUG}"
 
 # Set useful variables
 JAR_PATH="/resources/jar/dDBGSCAN_2.11-2.4.3_1.0.0.jar"
 CURRENT_EXP_OUTPUT=$OUTPUT_REMOTE/dDBGSCAN/part_$PARTITION_LVL/exp_$INDEX/
 
 echo "Preparing run cmd"
-RUN_CMD="/usr/lib/spark/bin/spark-submit --class com.github.dmarcous.ddbgscan.api.CLIRunner --driver-java-options='-Dspark.yarn.app.container.log.dir=/mnt/var/log/hadoop' --conf spark.default.parallelism=${PARALLELISM} ${LOCAL}${JAR_PATH} --inputFilePath ${INPUT_REMOTE} --outputFolderPath ${CURRENT_EXP_OUTPUT} --positionFieldId 0 --positionFieldLon 1 --positionFieldLat 2 --inputFieldDelimiter , --numPartitions ${NUM_PARTITIONS} --epsilon ${EPSILON} --minPts ${MINPTS} --neighborhoodPartitioningLvl ${PARTITION_LVL}"
+RUN_CMD="/usr/lib/spark/bin/spark-submit --class com.github.dmarcous.ddbgscan.api.CLIRunner --driver-java-options='-Dspark.yarn.app.container.log.dir=/mnt/var/log/hadoop' --conf spark.default.parallelism=${PARALLELISM} ${LOCAL}${JAR_PATH} --inputFilePath ${INPUT_REMOTE} --outputFolderPath ${CURRENT_EXP_OUTPUT} --positionFieldId 0 --positionFieldLon 1 --positionFieldLat 2 --inputFieldDelimiter , --numPartitions ${NUM_PARTITIONS} --epsilon ${EPSILON} --minPts ${MINPTS} --partitioningStrategy ${PARTITIONING_STATEGY} --neighborhoodPartitioningLvl ${PARTITION_LVL} maxPointsPerPartition ${MAX_POINTS_PER_PARTITION} debug ${DEBUG}"
 echo ${RUN_CMD}
 
 echo "Starting run"

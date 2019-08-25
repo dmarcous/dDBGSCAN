@@ -1,6 +1,6 @@
 package com.github.dmarcous.ddbgscan.core.config
 
-import com.github.dmarcous.ddbgscan.core.config.CoreConfig.{DEFAULT_NEIGHBOUR_SIMILARITY_EXTENSION_FUNCTION, MISSING_NEIGHBORHOOD_LVL}
+import com.github.dmarcous.ddbgscan.core.config.CoreConfig.{DEFAULT_NEIGHBOUR_SIMILARITY_EXTENSION_FUNCTION, DEFAULT_NUM_PARTITIONS, GEO_PARTITIONING_STRATEGY, MISSING_NEIGHBORHOOD_LVL}
 import org.scalatest.FlatSpec
 import org.scalatest.Matchers._
 
@@ -17,7 +17,9 @@ class AlgorithmParametersTest extends FlatSpec{
       AlgorithmParameters(
         epsilon,
         minPts,
+        GEO_PARTITIONING_STRATEGY,
         neighborhoodPartitioningLvl,
+        DEFAULT_NUM_PARTITIONS,
         isNeighbourInstances
       )
 
@@ -34,7 +36,9 @@ class AlgorithmParametersTest extends FlatSpec{
         AlgorithmParameters(
           epsilon,
           minPts,
+          GEO_PARTITIONING_STRATEGY,
           MISSING_NEIGHBORHOOD_LVL,
+          DEFAULT_NUM_PARTITIONS,
           isNeighbourInstances
         )
 

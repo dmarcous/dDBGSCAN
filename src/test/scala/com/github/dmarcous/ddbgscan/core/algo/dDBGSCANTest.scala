@@ -65,7 +65,9 @@ class dDBGSCANTest extends FlatSpec{
     AlgorithmParameters(
       epsilon,
       minPts,
+      GEO_PARTITIONING_STRATEGY,
       S2_LVL,
+      DEFAULT_NUM_PARTITIONS,
       DEFAULT_NEIGHBOUR_SIMILARITY_EXTENSION_FUNCTION
     )
 
@@ -77,7 +79,7 @@ class dDBGSCANTest extends FlatSpec{
   "run" should " cluster given instances " in
   {
     val globallyClusteredData =
-      dDBGSCAN.run(spark, clusteringDataset, params)
+      dDBGSCAN.run(spark, clusteringDataset, params, DEFAULT_DEBUG)
 
     // Returns ClusteredInstance
     val clusteringResults = globallyClusteredData.collect

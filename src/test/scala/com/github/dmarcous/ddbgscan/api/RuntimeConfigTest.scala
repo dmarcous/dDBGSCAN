@@ -14,7 +14,9 @@ class RuntimeConfigTest extends FlatSpec{
   val parameters = AlgorithmParameters(
     epsilon,
     minPts,
+    GEO_PARTITIONING_STRATEGY,
     neighborhoodPartitioningLvl,
+    DEFAULT_NUM_PARTITIONS,
     isNeighbourInstances
   )
   val inputPath = "s3://my.bucket/ddbgscan/inputs/input.csv"

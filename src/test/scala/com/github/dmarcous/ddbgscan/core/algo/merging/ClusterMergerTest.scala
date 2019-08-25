@@ -68,7 +68,9 @@ class ClusterMergerTest extends FlatSpec{
     AlgorithmParameters(
       epsilon,
       minPts,
+      GEO_PARTITIONING_STRATEGY,
       S2_LVL,
+      DEFAULT_NUM_PARTITIONS,
       DEFAULT_NEIGHBOUR_SIMILARITY_EXTENSION_FUNCTION
     )
 

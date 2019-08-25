@@ -33,7 +33,7 @@ object dDBGSCANRunner {
     println("Starting clustering...")
     val results =
       dDBGSCAN.run(spark, clusteringData,
-        conf.parameters)
+        conf.parameters, conf.ioConfig.debug)
 
     // Write output
     println("Writing results...")
