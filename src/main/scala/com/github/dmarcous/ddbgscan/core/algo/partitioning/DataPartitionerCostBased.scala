@@ -18,11 +18,11 @@ object DataPartitionerCostBased {
   {
     import spark.implicits._
 
-    val minimumRectangleSize = UnitConverters.metricToAngularDistance(epsilon)*2
+    val minimumRectangleSize = UnitConverters.metricToAngularDistance(epsilon * 2)
 
     val minimumRectanglesWithCount =
       data
-      .map{case(key, inst) => ((toMinimumBoundingRectangle(inst.lonLatLocation, epsilon),1))}
+      .map{case(key, inst) => ((toMinimumBoundingRectangle(inst.lonLatLocation, minimumRectangleSize),1))}
       .groupByKey(_._1)
       .count()
 
@@ -45,7 +45,7 @@ object DataPartitionerCostBased {
       if rectangleContainsPoint(outer,inst.lonLatLocation)
     } yield (id, inst)
 
-    val repartitionedData =
+    val formattedData =
       duplicated
       .map{case(key, inst) => (key.toLong, inst)}
       .toDS()
@@ -54,18 +54,34 @@ object DataPartitionerCostBased {
       // Sum number of inner instances
       .mapGroups{case(cellId,instances)=>
         (cellId,instances.toList)}
+
+//    println("count_partitions ------ " + formattedData.map(_._1).distinct().count())
+    val repartitionedData =
+      formattedData
       .repartitionByRange(partitionExprs=$"_1") // Partition by cell id
 
     // Trigger shuffle for repartitioning to happen
     repartitionedData.count()
+//    formattedData.count()
 
     repartitionedData
+//    formattedData
   }
 
-  private def toMinimumBoundingRectangle(coordinate: (Double, Double), eps: Double): (Double, Double, Double, Double) = {
-    val x = coordinate._1
-    val y = coordinate._2
-    getBoundingBox(x, y, eps)
+  def toMinimumBoundingRectangle(coordinate: (Double, Double), minimumRectangleSize: Double): (Double, Double, Double, Double) = {
+    val x = getCorner(coordinate._1, minimumRectangleSize)
+    val y = getCorner(coordinate._2, minimumRectangleSize)
+    (x, y, x + minimumRectangleSize, y + minimumRectangleSize)
+
+//    getBoundingBox(coordinate._1, coordinate._2, minimumRectangleSize) // change to metric
+  }
+
+  private def getCorner(partialCoordinate: Double, minimumRectangleSize: Double): Double = {
+    (shiftIfNegative(partialCoordinate, minimumRectangleSize) / minimumRectangleSize).intValue * minimumRectangleSize
+  }
+
+  private def shiftIfNegative(partialCoordinate: Double, minimumRectangleSize: Double): Double = {
+    if (partialCoordinate < 0) partialCoordinate - minimumRectangleSize else partialCoordinate
   }
 
   private def getBoundingBox(x: Double, y: Double, radiusMeters: Double): (Double, Double, Double, Double) = {
@@ -132,14 +148,10 @@ object DataPartitionerCostBased {
     self._1 < point._1 && point._1 < self._3 && self._2 < point._2 && point._2 < self._4
   }
 
+  type DBSCANRectangle = (Double, Double, Double, Double)
+  type RectangleWithCount = ((Double, Double, Double, Double), Long)
 
-  //case class DBSCANGeoPoint(x, y)
-  //case class DBSCANRectangle(x: Double, y: Double, x2: Double, y2: Double)
-  //type RectangleWithCount = ((Double, Double, Double, Double), Long)
-  private type DBSCANRectangle = (Double, Double, Double, Double)
-  private type RectangleWithCount = ((Double, Double, Double, Double), Long)
-
-  private def findEvenSplitsPartitions(toSplit: Dataset[((Double, Double, Double, Double), Long)],
+  def findEvenSplitsPartitions(toSplit: Dataset[((Double, Double, Double, Double), Long)],
                                maxPointsPerPartition: Long,
                                minimumRectangleSize: Double): List[((Double, Double, Double, Double), Long)] = {
 
@@ -169,8 +181,9 @@ object DataPartitionerCostBased {
     remaining match {
       case (rectangle, count) :: rest =>
         if (count > maxPointsPerPartition) {
-
+          println("count=" + count.toString + " > maxPointsPerPartition=" + maxPointsPerPartition)
           if (canBeSplit(rectangle, minimumRectangleSize)) {
+            println("Can be split = True")
             def cost = (r: DBSCANRectangle) => ((pointsIn(rectangle) / 2) - pointsIn(r)).abs
             val (split1, split2) = split(rectangle, cost, minimumRectangleSize)
             val s1 = (split1, pointsIn(split1))
@@ -178,10 +191,12 @@ object DataPartitionerCostBased {
             partition(s1 :: s2 :: rest, partitioned, pointsIn, minimumRectangleSize, maxPointsPerPartition)
 
           } else {
+            println("Can be split = False")
             partition(rest, (rectangle, count) :: partitioned, pointsIn, minimumRectangleSize, maxPointsPerPartition)
           }
 
         } else {
+          println("count=" + count.toString + " <= maxPointsPerPartition=" + maxPointsPerPartition)
           partition(rest, (rectangle, count) :: partitioned, pointsIn, minimumRectangleSize, maxPointsPerPartition)
         }
 
@@ -191,7 +206,7 @@ object DataPartitionerCostBased {
 
   }
 
-  private def split(
+  def split(
              rectangle: DBSCANRectangle,
              cost: (DBSCANRectangle) => Long,
              minimumRectangleSize: Double): (DBSCANRectangle, DBSCANRectangle) = {
@@ -238,9 +253,11 @@ object DataPartitionerCostBased {
    */
   private def findPossibleSplits(box: DBSCANRectangle, minimumRectangleSize: Double): Set[DBSCANRectangle] = {
 
-    val xSplits = (box._1 + minimumRectangleSize) until box._3 by minimumRectangleSize
+    val xIncrement = if (box._3 >= box._1) minimumRectangleSize else (minimumRectangleSize * -1.0)
+    val xSplits = (box._1 + xIncrement) until box._3 by xIncrement
 
-    val ySplits = (box._2 + minimumRectangleSize) until box._4 by minimumRectangleSize
+    val yIncrement = if (box._4 >= box._2) minimumRectangleSize else (minimumRectangleSize * -1.0)
+    val ySplits = (box._2 + yIncrement) until box._4 by yIncrement
 
     val splits =
       xSplits.map(x => (box._1, box._2, x, box._4)) ++
@@ -252,12 +269,13 @@ object DataPartitionerCostBased {
   /**
    * Returns true if the given rectangle can be split into at least two rectangles of minimum size
    */
-  private def canBeSplit(box: DBSCANRectangle, minimumRectangleSize: Double): Boolean = {
-    (box._3 - box._1 > minimumRectangleSize * 2 ||
-      box._4 - box._2 > minimumRectangleSize * 2)
+  def canBeSplit(box: DBSCANRectangle, minimumRectangleSize: Double): Boolean = {
+    println("can be spit params : " + box._3 + "," + box._1 + "," + minimumRectangleSize)
+    (math.abs(box._3 - box._1) > minimumRectangleSize ||
+      math.abs(box._4 - box._2) > minimumRectangleSize)
   }
 
-  private def pointsInRectangle(space: Set[RectangleWithCount], rectangle: DBSCANRectangle): Long = {
+  def pointsInRectangle(space: Set[RectangleWithCount], rectangle: DBSCANRectangle): Long = {
     space.view
       .filter({ case (current, _) => rectangleContainsRectangle(rectangle, current) })
       .foldLeft(0L) {
@@ -265,7 +283,7 @@ object DataPartitionerCostBased {
       }
   }
 
-  private def findBoundingRectangle(rectanglesWithCount: Dataset[((Double, Double, Double, Double), Long)]): (Double, Double, Double, Double) = {
+  def findBoundingRectangle(rectanglesWithCount: Dataset[((Double, Double, Double, Double), Long)]): (Double, Double, Double, Double) = {
 
     val invertedRectangle =
       (Double.MaxValue, Double.MaxValue, Double.MinValue, Double.MinValue)

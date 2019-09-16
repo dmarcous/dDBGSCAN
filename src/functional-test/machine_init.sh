@@ -55,12 +55,17 @@ break;
 esac
 shift
 done
+
 echo 'Running with parameters : '
 echo "CLUSTER_NAME = ${CLUSTER_NAME}"
 echo "EC2_ATTRIBUTES = ${EC2_ATTRIBUTES}"
-echo "BOOTSTRAP_ACTIONS = ${BOOTSTRAP_ACTIONS}"
 echo "SERVICE_ROLE = ${SERVICE_ROLE}"
 echo "LOG_URI = ${LOG_URI}"
-echo "TAGS = ${TAGS}"
 
-aws emr create-cluster --name $CLUSTER_NAME --ec2-attributes $EC2_ATTRIBUTES --bootstrap-actions $BOOTSTRAP_ACTIONS --service-role $SERVICE_ROLE --log-uri $LOG_URI --applications Name=Spark --instance-group Name=Master,InstanceGroupType=MASTER,InstanceType=r5d.12xlarge,InstanceCount=1 Name=Core,InstanceGroupType=CORE,InstanceType=r5d.12xlarge,InstanceCount=15 --visible-to-all-users --enable-debugging --tags $TAGS --release-label emr-5.26.0
+SPACE=" "
+MULTITAGS="${TAGS//_SPACE_/$SPACE}"
+echo "TAGS = ${MULTITAGS}"
+MULTIBOOTS="${BOOTSTRAP_ACTIONS//_SPACE_/$SPACE}"
+echo "BOOTSTRAP_ACTIONS = ${MULTIBOOTS}"
+
+aws emr create-cluster --name $CLUSTER_NAME --ec2-attributes $EC2_ATTRIBUTES --bootstrap-actions $MULTIBOOTS --service-role $SERVICE_ROLE --log-uri $LOG_URI --applications Name=Spark --instance-group Name=Master,InstanceGroupType=MASTER,InstanceType=r5d.12xlarge,InstanceCount=1 Name=Core,InstanceGroupType=CORE,InstanceType=r5d.12xlarge,InstanceCount=15 --visible-to-all-users --enable-debugging --tags $MULTITAGS --release-label emr-5.26.0
