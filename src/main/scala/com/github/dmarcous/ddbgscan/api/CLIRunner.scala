@@ -87,7 +87,7 @@ object CLIRunner {
     val validatedPartitioningStrategy =
       if(SUPPORTED_PARTITIONING_STRATEGIES.contains(partitioningStrategy)) partitioningStrategy
       else {
-        println(" Unsupported partitioining strategy : " + partitioningStrategy + ", resorting to defauly")
+        println(" Unsupported partitioning strategy : " + partitioningStrategy + ", resorting to default")
         SUPPORTED_PARTITIONING_STRATEGIES.head
       }
     println("partitioningStrategy : " + validatedPartitioningStrategy)

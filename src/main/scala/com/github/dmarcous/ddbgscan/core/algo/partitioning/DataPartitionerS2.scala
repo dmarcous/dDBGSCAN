@@ -67,12 +67,17 @@ object DataPartitionerS2 {
       epsilon)
   }
 
+  def getMinimalLookupArea(epsilon: Double): Double =
+  {
+    UnitConverters.metricToUnitSphereArea(epsilon*epsilon)/2
+  }
+
   def getDensityReachableCells(lon: Double, lat: Double, level : Int, epsilon: Double): List[Long] =
   {
     val startPoint = S2LatLng.fromDegrees(lat, lon).normalized().toPoint
     val regionToCover = S2Cap.fromAxisHeight(
       startPoint,
-      UnitConverters.metricToUnitSphereArea(epsilon*epsilon)/2)
+      getMinimalLookupArea(epsilon))
 
     var coveringCells = new ArrayList[S2CellId]()
     S2RegionCoverer.getSimpleCovering(regionToCover, startPoint, level, coveringCells)

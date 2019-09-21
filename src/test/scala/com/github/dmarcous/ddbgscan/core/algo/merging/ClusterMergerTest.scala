@@ -235,4 +235,78 @@ class ClusterMergerTest extends FlatSpec{
     clusteringResults.filter(_.instanceStatus == BORDER.value).size should equal (3)
     clusteringResults.filter(_.instanceStatus == NOISE.value).size should equal (1)
   }
+
+//  // Edge case test
+//  "Edge case test" should " return same clustering with 2 different s2 lvls " in
+//    {
+//      val ds =
+//        spark.createDataset(
+//          Seq(
+//            "1,1.539409,42.511316",
+//            "65,1.5368600,42.51123",
+//            "100,1.536462,42.512279",
+//            "101,1.537420,42.510676",
+//            "102,1.537816,42.510363",
+//            "103,1.538486,42.510051",
+//            "104,1.539297,42.509750",
+//            "105,1.540198,42.509355",
+//            "106,1.543234,42.509157",
+//            "107,1.543970,42.509011",
+//            "108,1.545131,42.509192",
+//            "109,1.546056,42.509769",
+//            "110,1.547028,42.510242",
+//            "111,1.547834,42.510673",
+//            "796,1.55108,42.51325",
+//            "1000,1.549808,42.512417",
+//            "2542,1.54782,42.51209",
+//            "3054,1.54829,42.5116"
+//      ))
+//      val positionId = 0
+//      val positionLon = DEFAULT_LONGITUDE_POSITION_FIELD_NUMBER+1
+//      val positionLat = DEFAULT_LATITUDE_POSITION_FIELD_NUMBER+1
+//      val delimiter = DEFAULT_GEO_FILE_DELIMITER
+//      val numPartitions = 1
+//      val ioConfig = IOConfig(
+//        inputPath,
+//        outputFolderPath,
+//        positionId,
+//        positionLon,
+//        positionLat,
+//        delimiter,
+//        numPartitions
+//      )
+//      spark.sparkContext.setCheckpointDir("/tmp")
+//
+//      val minPts = 8 //5
+//      val epsilon = 300.0 //100.0
+//      val lvl2 = 14
+//      val params2 =
+//        AlgorithmParameters(
+//          epsilon,
+//          minPts,
+//          GEO_PARTITIONING_STRATEGY,
+//          lvl2,
+//          DEFAULT_NUM_PARTITIONS,
+//          DEFAULT_NEIGHBOUR_SIMILARITY_EXTENSION_FUNCTION
+//        )
+//      println("epsilon " + params2.epsilon)
+//      println("lvl " + params2.neighborhoodPartitioningLvl)
+//      val lvl2_clusteringDataset =
+//        GeoPropertiesExtractor.fromLonLatDelimitedFile(
+//          spark, ds, lvl2, ioConfig
+//        )
+//      val lvl2_partitionedData = DataPartitionerS2.partitionData(spark, lvl2_clusteringDataset, epsilon, lvl2)
+//      val lvl2_locallyClusteredData = DataGeoClusterer.clusterGeoData(spark, lvl2_partitionedData, params2)
+//      val lvl2_instanceStateData = ClusterMerger.computeInstanceState(spark, lvl2_locallyClusteredData)
+//      val lvl2_mergeClusterEdgeList = ClusterMerger.extractMergeCandidates(spark, lvl2_instanceStateData)
+//      val lvl2_mergedClustersToOriginalClustersMapping = ClusterMerger.mergeClusters(spark, lvl2_mergeClusterEdgeList)
+//      val lvl2_globallyClusteredData =
+//        createGlobalClusterMapping(spark, lvl2_instanceStateData, lvl2_mergedClustersToOriginalClustersMapping)
+//
+//      println("lvl2_mergedClustersToOriginalClustersMapping")
+//      lvl2_mergedClustersToOriginalClustersMapping.collect.foreach(println)
+//      println("lvl2_globallyClusteredData")
+//      lvl2_globallyClusteredData.collect.foreach(println)
+//
+//    }
 }

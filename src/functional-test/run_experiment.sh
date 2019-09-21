@@ -120,7 +120,7 @@ JAR_PATH="/resources/jar/dDBGSCAN_2.11-2.4.3_1.0.0.jar"
 CURRENT_EXP_OUTPUT=$OUTPUT_REMOTE/dDBGSCAN/$PARTITIONING_STATEGY/partlvl_$PARTITION_LVL/maxp_$MAX_POINTS_PER_PARTITION/exp_$INDEX/
 
 echo "Preparing run cmd"
-RUN_CMD="/usr/lib/spark/bin/spark-submit --class com.github.dmarcous.ddbgscan.api.CLIRunner --driver-java-options='-Dspark.yarn.app.container.log.dir=/mnt/var/log/hadoop' --conf spark.default.parallelism=${PARALLELISM} --conf spark.driver.memory=${DRIVER_MEMORY} ${LOCAL}${JAR_PATH} --inputFilePath ${INPUT_REMOTE} --outputFolderPath ${CURRENT_EXP_OUTPUT} --positionFieldId 0 --positionFieldLon 1 --positionFieldLat 2 --inputFieldDelimiter , --numPartitions ${NUM_PARTITIONS} --epsilon ${EPSILON} --minPts ${MINPTS} --partitioningStrategy ${PARTITIONING_STATEGY} --neighborhoodPartitioningLvl ${PARTITION_LVL} --maxPointsPerPartition ${MAX_POINTS_PER_PARTITION} --debug ${DEBUG}"
+RUN_CMD="/usr/lib/spark/bin/spark-submit --class com.github.dmarcous.ddbgscan.api.CLIRunner --driver-java-options='-Dspark.yarn.app.container.log.dir=/mnt/var/log/hadoop' --conf spark.default.parallelism=${PARALLELISM} --conf spark.driver.memory=${DRIVER_MEMORY} --conf spark.driver.maxResultSize=4g ${LOCAL}${JAR_PATH} --inputFilePath ${INPUT_REMOTE} --outputFolderPath ${CURRENT_EXP_OUTPUT} --positionFieldId 0 --positionFieldLon 1 --positionFieldLat 2 --inputFieldDelimiter , --numPartitions ${NUM_PARTITIONS} --epsilon ${EPSILON} --minPts ${MINPTS} --partitioningStrategy ${PARTITIONING_STATEGY} --neighborhoodPartitioningLvl ${PARTITION_LVL} --maxPointsPerPartition ${MAX_POINTS_PER_PARTITION} --debug ${DEBUG}"
 echo ${RUN_CMD}
 
 echo "Starting run"

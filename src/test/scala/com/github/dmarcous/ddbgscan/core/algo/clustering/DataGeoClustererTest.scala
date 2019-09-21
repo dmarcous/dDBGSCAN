@@ -1,5 +1,7 @@
 package com.github.dmarcous.ddbgscan.core.algo.clustering
 
+import com.github.dmarcous.ddbgscan.core.algo.merging.ClusterMerger
+import com.github.dmarcous.ddbgscan.core.algo.merging.ClusterMerger.createGlobalClusterMapping
 import com.github.dmarcous.ddbgscan.core.algo.partitioning.DataPartitionerS2
 import com.github.dmarcous.ddbgscan.core.config.CoreConfig.ClusteringInstanceStatusValue._
 import com.github.dmarcous.ddbgscan.core.config.CoreConfig._

@@ -68,7 +68,7 @@ object DataGeoClusterer {
             p.value().cluster = currentCluster
             p.value().instanceStatus = CORE.value
 
-            // Iterate over neighbours (in DBSCAN article called "Expand the cluster)
+            // Iterate over neighbours (in DBSCAN article called "Expand the cluster")
             expandCluster(neighbours, searchTree, currentCluster, parameters)
           }
         }// traverse unvisited points

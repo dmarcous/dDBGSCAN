@@ -11,6 +11,13 @@ class AlgorithmParametersTest extends FlatSpec{
   val FilledNeighborhoodPartitioningLvl = 18
   val isNeighbourInstances = DEFAULT_NEIGHBOUR_SIMILARITY_EXTENSION_FUNCTION
 
+  "getMinimalNeighborhoodPartitioningLvl" should "get minimal allowed level for partitioning" in
+  {
+    val eps = 300.0
+    val minPts = 1
+    AlgorithmParameters(eps,minPts).getMinimalNeighborhoodPartitioningLvl(eps) should equal (neighborhoodPartitioningLvl)
+  }
+
   "Full constructor" should "return a valid object" in
   {
     val params =

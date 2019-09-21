@@ -35,7 +35,7 @@ object PointSearchUtilities {
   // epsilon = meters
   def getGeoDensityReachablePointsFromSearchTree(tree: RTree[ClusteringInstance, Point], lonLat: Point, epsilon: Double) : List[Entry[ClusteringInstance, Point]] =
   {
-    val reachingDistanceKM : Double = epsilon/1000.0
+    val reachingDistanceKM : Double = (epsilon + 0.1)/1000.0 // Add buffer to epsilon to get all points
 
     // First we need to calculate an enclosing lat long rectangle for this
     // distance then we refine on the exact distance
