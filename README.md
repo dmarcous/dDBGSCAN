@@ -6,6 +6,7 @@ over large datasets using Apache Spark.
 ## Details
 
 This project contains an implementation of the dDBGSCAN algorithm including running examples.
+
 Further details in paper : TBD
 
 ### Algorithm Steps
@@ -13,7 +14,7 @@ Further details in paper : TBD
   1. Partitioning using S2cell units
   2. Local clustering using DBSCAN with r*-tree
   3. Global merging using graph(frames) connected components
-s
+
 ### Parameters
 
   1. Epsilon (ε) - maximal meters distance between points to be defined as “density
