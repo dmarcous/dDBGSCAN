@@ -37,3 +37,6 @@ org.scala-ide.sdt.update-site/site.xml`
 ### OSX ###
 .DS_Store
 
+### Python files ###
+__pycache__
+*.pyc
