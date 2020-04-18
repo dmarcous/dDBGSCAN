@@ -6,5 +6,5 @@ case class RuntimeConfig(
     ioConfig: IOConfig,
     parameters : AlgorithmParameters
 )
-{
+{ 
 }
