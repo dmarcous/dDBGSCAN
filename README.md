@@ -196,7 +196,12 @@ Parameters stated above
 --epsilon [double] --minPts [int]
 [--positionFieldId int] [--positionFieldLon int] [--positionFieldLat int]
 [--inputFieldDelimiter int]
+[--partitioningStrategy int]
+[--geoDecimalPlacesSensitivity int]
 [--neighborhoodPartitioningLvl int] [--isNeighbourInstances_function_code int]
+[--numPartitions int]
+[--maxPointsPerPartition int]
+[--debug boolean]
 
 ## Example 1 - short form
 /usr/lib/spark/bin/spark-submit --class com.dmarcous.github.dDBGSCAN.CLIRunner /tmp/dDBGSCAN.jar
