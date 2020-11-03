@@ -1,7 +1,7 @@
 package com.github.dmarcous.ddbgscan.core.algo.partitioning
 
 import com.github.dmarcous.ddbgscan.core.algo.partitioning.DataPartitionerCostBased.{DBSCANRectangle, RectangleWithCount, canBeSplit, findBoundingRectangle, findEvenSplitsPartitions, partition, pointsInRectangle, split, toMinimumBoundingRectangle}
-import com.github.dmarcous.ddbgscan.core.config.CoreConfig.{DEFAULT_GEO_FILE_DELIMITER, DEFAULT_LATITUDE_POSITION_FIELD_NUMBER, DEFAULT_LONGITUDE_POSITION_FIELD_NUMBER, NO_UNIQUE_ID_FIELD}
+import com.github.dmarcous.ddbgscan.core.config.CoreConfig.{DEFAULT_GEO_FILE_DELIMITER, DEFAULT_LATITUDE_POSITION_FIELD_NUMBER, DEFAULT_LONGITUDE_POSITION_FIELD_NUMBER, MISSING_GEO_DECIMAL_SENSITIVITY_LVL, NO_UNIQUE_ID_FIELD}
 import com.github.dmarcous.ddbgscan.core.config.IOConfig
 import com.github.dmarcous.ddbgscan.core.preprocessing.GeoPropertiesExtractor
 import com.github.dmarcous.s2utils.converters.UnitConverters
@@ -20,6 +20,7 @@ class DataPartitionerCostBasedTest extends FlatSpec{
   import spark.implicits._
 
   val S2_LVL = 15
+  val GEO_SENSITIVITY = MISSING_GEO_DECIMAL_SENSITIVITY_LVL
   val maxPointsPerPartition=3
   val maxPointsPerPartition_minimal=1
   val epsilon = 40.0
@@ -57,7 +58,7 @@ class DataPartitionerCostBasedTest extends FlatSpec{
 
   val complexDataset =
     GeoPropertiesExtractor.fromLonLatDelimitedFile(
-      spark, complexLonLatDelimitedGeoData, S2_LVL, ioConfig
+      spark, complexLonLatDelimitedGeoData, GEO_SENSITIVITY, S2_LVL, ioConfig
     )
 
   "partitionData" should "keep close together points in the same partition" in

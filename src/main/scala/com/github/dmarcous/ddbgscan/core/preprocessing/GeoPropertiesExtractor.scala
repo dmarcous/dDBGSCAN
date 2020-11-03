@@ -1,6 +1,6 @@
 package com.github.dmarcous.ddbgscan.core.preprocessing
 
-import com.github.dmarcous.ddbgscan.core.config.CoreConfig.{DEFAULT_GEO_FILE_DELIMITER, DEFAULT_RECORD_ID, NO_UNIQUE_ID_FIELD}
+import com.github.dmarcous.ddbgscan.core.config.CoreConfig.{DEFAULT_GEO_FILE_DELIMITER, DEFAULT_RECORD_ID, NO_UNIQUE_ID_FIELD, MISSING_GEO_DECIMAL_SENSITIVITY_LVL}
 import com.github.dmarcous.ddbgscan.core.config.IOConfig
 import com.github.dmarcous.ddbgscan.model.{ClusteringInstance, KeyGeoEntity, LonLatGeoEntity}
 import org.apache.spark.ml.linalg.Vectors
@@ -12,6 +12,7 @@ object GeoPropertiesExtractor {
 
   def fromLonLatDelimitedFile(@transient spark: SparkSession,
                               data: Dataset[String],
+                              geoDecimalPlacesSensitivity: Int,
                               neighborhoodPartitioningLvl: Int,
                               ioConfig : IOConfig)
   : Dataset[(KeyGeoEntity, ClusteringInstance)] =
@@ -36,29 +37,12 @@ object GeoPropertiesExtractor {
         (id, lon, lat, features)
       }
 
-    val identifiedData =
-      if(ioConfig.positionId == NO_UNIQUE_ID_FIELD)
-      {
-        parsedData
-          .toDF("id", "lon", "lat", "features")
-          .withColumn("id",monotonically_increasing_id())
-          .as[(Long, Double, Double, Vector)]
-      }
-      else
-      {
-        parsedData
-      }
-
-    identifiedData
-      .map{case(id, lon, lat, features) =>
-        (new KeyGeoEntity(LonLatGeoEntity(lon, lat), neighborhoodPartitioningLvl),
-          ClusteringInstance(recordId = id, lonLatLocation= (lon, lat), features = features)
-        )
-      }
+    formatParsedData(spark, parsedData, ioConfig.positionId, neighborhoodPartitioningLvl, geoDecimalPlacesSensitivity)
   }
 
   def fromLonLatDataFrame(@transient spark: SparkSession,
                           data: DataFrame,
+                          geoDecimalPlacesSensitivity: Int,
                           neighborhoodPartitioningLvl: Int,
                           ioConfig : IOConfig)
   : Dataset[(KeyGeoEntity, ClusteringInstance)] =
@@ -84,8 +68,20 @@ object GeoPropertiesExtractor {
         (id, lon, lat, features)
       }
 
+    formatParsedData(spark, parsedData, ioConfig.positionId, neighborhoodPartitioningLvl, geoDecimalPlacesSensitivity)
+  }
+
+  private def formatParsedData(@transient spark: SparkSession,
+                               parsedData: Dataset[(Long, Double, Double, Vector)],
+                               positionId: Int,
+                               neighborhoodPartitioningLvl: Int,
+                               geoDecimalPlacesSensitivity: Int)
+  : Dataset[(KeyGeoEntity, ClusteringInstance)] =
+  {
+    import spark.implicits._
+
     val identifiedData =
-      if(ioConfig.positionId == NO_UNIQUE_ID_FIELD)
+      if(positionId == NO_UNIQUE_ID_FIELD)
       {
         parsedData
           .toDF("id", "lon", "lat", "features")
@@ -97,11 +93,36 @@ object GeoPropertiesExtractor {
         parsedData
       }
 
-    identifiedData
-      .map{case(id, lon, lat, features) =>
+    val formattedData =
+      identifiedData.map{case(id, lon, lat, features) =>
         (new KeyGeoEntity(LonLatGeoEntity(lon, lat), neighborhoodPartitioningLvl),
           new ClusteringInstance(recordId = id, lonLatLocation = (lon, lat), features = features)
         )
       }
+
+    val geoTruncatedData =
+      if (geoDecimalPlacesSensitivity != MISSING_GEO_DECIMAL_SENSITIVITY_LVL)
+        {
+          formattedData.map{case(key, instance) =>
+            (
+              key,
+              new ClusteringInstance(
+                recordId = instance.recordId,
+                lonLatLocation = (roundDouble(instance.lonLatLocation._1, geoDecimalPlacesSensitivity), roundDouble(instance.lonLatLocation._2, geoDecimalPlacesSensitivity)),
+                features = instance.features)
+            )
+          }
+        }
+      else
+        {
+          formattedData
+        }
+
+    geoTruncatedData
+  }
+
+  private def roundDouble(double: Double, precision: Int): Double =
+  {
+    BigDecimal(double).setScale(precision, BigDecimal.RoundingMode.HALF_UP).toDouble
   }
 }

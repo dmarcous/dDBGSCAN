@@ -11,9 +11,12 @@
 # --minpts
 # --epsilon
 # --partitioningStrategy
+# --geoDecimalPlacesSensitivity
 # --debug
 # --maxPointsPerPartition
 # --driverMemory
+# --executorMemory
+# --maxResultSize
 
 # Experiment setup
 MINPTS=20
@@ -27,10 +30,13 @@ PARTITION_LVL=15
 INDEX=0
 PARALLELISM=256
 NUM_PARTITIONS=256
-PARTITIONING_STATEGY="S2"
+PARTITIONING_STRATEGY="S2"
+GEO_SENSITIVITY=-1
 DEBUG="false"
 MAX_POINTS_PER_PARTITION=256
-DRIVER_MEMORY="1g"
+EXECUTOR_MEMORY="6g"
+DRIVER_MEMORY="12g"
+MAX_RESULT_SIZE="4g"
 
 # Read params
 echo 'Reading script params...'
@@ -75,7 +81,11 @@ EPSILON="${i#*=}"
 shift
 ;;
 --partitioningStrategy=*)
-PARTITIONING_STATEGY="${i#*=}"
+PARTITIONING_STRATEGY="${i#*=}"
+shift
+;;
+--geoDecimalPlacesSensitivity=*)
+GEO_SENSITIVITY="${i#*=}"
 shift
 ;;
 --debug=*)
@@ -88,6 +98,14 @@ shift
 ;;
 --driverMemory=*)
 DRIVER_MEMORY="${i#*=}"
+shift
+;;
+--executorMemory=*)
+EXECUTOR_MEMORY="${i#*=}"
+shift
+;;
+--maxResultSize=*)
+MAX_RESULT_SIZE="${i#*=}"
 shift
 ;;
 -*)
@@ -110,17 +128,20 @@ echo "EPSILON = ${EPSILON}"
 echo "INDEX = ${INDEX}"
 echo "PARALLELISM = ${PARALLELISM}"
 echo "NUM_PARTITIONS = ${NUM_PARTITIONS}"
-echo "PARTITIONING_STATEGY = ${PARTITIONING_STATEGY}"
+echo "PARTITIONING_STRATEGY = ${PARTITIONING_STRATEGY}"
+echo "GEO_SENSITIVITY = ${GEO_SENSITIVITY}"
 echo "MAX_POINTS_PER_PARTITION = ${MAX_POINTS_PER_PARTITION}"
 echo "DRIVER_MEMORY = ${DRIVER_MEMORY}"
+echo "EXECUTOR_MEMORY = ${EXECUTOR_MEMORY}"
+echo "MAX_RESULT_SIZE = ${MAX_RESULT_SIZE}"
 echo "DEBUG = ${DEBUG}"
 
 # Set useful variables
 JAR_PATH="/resources/jar/dDBGSCAN_2.11-2.4.3_1.0.0.jar"
-CURRENT_EXP_OUTPUT=$OUTPUT_REMOTE/dDBGSCAN/$PARTITIONING_STATEGY/partlvl_$PARTITION_LVL/maxp_$MAX_POINTS_PER_PARTITION/exp_$INDEX/
+CURRENT_EXP_OUTPUT=$OUTPUT_REMOTE/dDBGSCAN/$PARTITIONING_STRATEGY/partlvl_$PARTITION_LVL/maxp_$MAX_POINTS_PER_PARTITION/exp_$INDEX/
 
 echo "Preparing run cmd"
-RUN_CMD="/usr/lib/spark/bin/spark-submit --class com.github.dmarcous.ddbgscan.api.CLIRunner --driver-java-options='-Dspark.yarn.app.container.log.dir=/mnt/var/log/hadoop' --conf spark.default.parallelism=${PARALLELISM} --conf spark.driver.memory=${DRIVER_MEMORY} --conf spark.driver.maxResultSize=4g ${LOCAL}${JAR_PATH} --inputFilePath ${INPUT_REMOTE} --outputFolderPath ${CURRENT_EXP_OUTPUT} --positionFieldId 0 --positionFieldLon 1 --positionFieldLat 2 --inputFieldDelimiter , --numPartitions ${NUM_PARTITIONS} --epsilon ${EPSILON} --minPts ${MINPTS} --partitioningStrategy ${PARTITIONING_STATEGY} --neighborhoodPartitioningLvl ${PARTITION_LVL} --maxPointsPerPartition ${MAX_POINTS_PER_PARTITION} --debug ${DEBUG}"
+RUN_CMD="/usr/lib/spark/bin/spark-submit --class com.github.dmarcous.ddbgscan.api.CLIRunner --driver-java-options='-Dspark.yarn.app.container.log.dir=/mnt/var/log/hadoop' --conf spark.default.parallelism=${PARALLELISM} --conf spark.driver.memory=${DRIVER_MEMORY} --conf spark.executor.memory=${EXECUTOR_MEMORY} --conf spark.driver.maxResultSize=${MAX_RESULT_SIZE} ${LOCAL}${JAR_PATH} --inputFilePath ${INPUT_REMOTE} --outputFolderPath ${CURRENT_EXP_OUTPUT} --positionFieldId 0 --positionFieldLon 1 --positionFieldLat 2 --inputFieldDelimiter , --numPartitions ${NUM_PARTITIONS} --epsilon ${EPSILON} --minPts ${MINPTS} --partitioningStrategy ${PARTITIONING_STRATEGY} --geoDecimalPlacesSensitivity ${GEO_SENSITIVITY} --neighborhoodPartitioningLvl ${PARTITION_LVL} --maxPointsPerPartition ${MAX_POINTS_PER_PARTITION} --debug ${DEBUG}"
 echo ${RUN_CMD}
 
 echo "Starting run"

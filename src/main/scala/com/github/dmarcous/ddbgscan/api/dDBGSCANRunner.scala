@@ -26,6 +26,7 @@ object dDBGSCANRunner {
       GeoPropertiesExtractor.fromLonLatDelimitedFile(
         spark,
         data,
+        conf.parameters.geoDecimalPlacesSensitivity,
         conf.parameters.neighborhoodPartitioningLvl,
         conf.ioConfig)
 

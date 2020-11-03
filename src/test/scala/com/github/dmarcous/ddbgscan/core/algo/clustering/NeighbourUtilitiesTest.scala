@@ -23,6 +23,7 @@ class NeighbourUtilitiesTest extends FlatSpec{
   import spark.implicits._
 
   val S2_LVL = 15
+  val GEO_SENSITIVITY = MISSING_GEO_DECIMAL_SENSITIVITY_LVL
   val epsilon= 130.0
 
   val defaultLonLatDelimitedGeoData =
@@ -58,7 +59,7 @@ class NeighbourUtilitiesTest extends FlatSpec{
 
   val clusteringDataset =
     GeoPropertiesExtractor.fromLonLatDelimitedFile(
-      spark, defaultLonLatDelimitedGeoData, S2_LVL, ioConfig
+      spark, defaultLonLatDelimitedGeoData, GEO_SENSITIVITY, S2_LVL, ioConfig
     )
   val partitionedData = DataPartitionerS2.partitionData(spark, clusteringDataset, epsilon, S2_LVL)
   val instances = partitionedData.filter(_._1==1521455263322734592L).flatMap(_._2.toList).collect().toList.distinct

@@ -2,7 +2,7 @@ package com.github.dmarcous.ddbgscan.core.algo.clustering
 
 import com.github.davidmoten.rtree.geometry.Geometries
 import com.github.dmarcous.ddbgscan.core.algo.partitioning.DataPartitionerS2
-import com.github.dmarcous.ddbgscan.core.config.CoreConfig.{DEFAULT_GEO_FILE_DELIMITER, DEFAULT_LATITUDE_POSITION_FIELD_NUMBER, DEFAULT_LONGITUDE_POSITION_FIELD_NUMBER, NO_UNIQUE_ID_FIELD}
+import com.github.dmarcous.ddbgscan.core.config.CoreConfig.{DEFAULT_GEO_FILE_DELIMITER, DEFAULT_LATITUDE_POSITION_FIELD_NUMBER, DEFAULT_LONGITUDE_POSITION_FIELD_NUMBER, MISSING_GEO_DECIMAL_SENSITIVITY_LVL, NO_UNIQUE_ID_FIELD}
 import com.github.dmarcous.ddbgscan.core.config.IOConfig
 import com.github.dmarcous.ddbgscan.core.preprocessing.GeoPropertiesExtractor
 import org.apache.spark.sql.SparkSession
@@ -22,6 +22,7 @@ class PointSearchUtilitiesTest extends FlatSpec{
   import spark.implicits._
 
   val S2_LVL = 15
+  val GEO_SENSITIVITY = MISSING_GEO_DECIMAL_SENSITIVITY_LVL
   val epsilon= 100.0
 
   val defaultLonLatDelimitedGeoData =
@@ -57,7 +58,7 @@ class PointSearchUtilitiesTest extends FlatSpec{
 
   val clusteringDataset =
     GeoPropertiesExtractor.fromLonLatDelimitedFile(
-      spark, defaultLonLatDelimitedGeoData, S2_LVL, ioConfig
+      spark, defaultLonLatDelimitedGeoData, GEO_SENSITIVITY, S2_LVL, ioConfig
     )
   val partitionedData = DataPartitionerS2.partitionData(spark, clusteringDataset, epsilon, S2_LVL)
   val instances = partitionedData.filter(_._1==1521455263322734592L).flatMap(_._2.toList).collect().toList.distinct

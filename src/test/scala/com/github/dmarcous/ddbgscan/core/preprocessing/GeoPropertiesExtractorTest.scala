@@ -1,6 +1,6 @@
 package com.github.dmarcous.ddbgscan.core.preprocessing
 
-import com.github.dmarcous.ddbgscan.core.config.CoreConfig.{DEFAULT_GEO_FILE_DELIMITER, DEFAULT_LATITUDE_POSITION_FIELD_NUMBER, DEFAULT_LONGITUDE_POSITION_FIELD_NUMBER, NO_UNIQUE_ID_FIELD}
+import com.github.dmarcous.ddbgscan.core.config.CoreConfig.{DEFAULT_GEO_FILE_DELIMITER, DEFAULT_LATITUDE_POSITION_FIELD_NUMBER, DEFAULT_LONGITUDE_POSITION_FIELD_NUMBER, NO_UNIQUE_ID_FIELD, MISSING_GEO_DECIMAL_SENSITIVITY_LVL}
 import com.github.dmarcous.ddbgscan.core.config.IOConfig
 import org.apache.spark.sql.types.{DoubleType, IntegerType, StructField, StructType}
 import org.apache.spark.sql.{Row, SparkSession}
@@ -18,6 +18,7 @@ class GeoPropertiesExtractorTest extends FlatSpec{
   import spark.implicits._
 
   val S2_LVL = 15
+  val GEO_SENSITIVITY = MISSING_GEO_DECIMAL_SENSITIVITY_LVL
   val GEO_DATA_KEYS = Array(1521455259027767296L,1521455265470218240L)
   val GEO_DATA_VALUES =
     Array(
@@ -90,7 +91,7 @@ class GeoPropertiesExtractorTest extends FlatSpec{
   {
     val clusteringDataset =
       GeoPropertiesExtractor.fromLonLatDelimitedFile(
-        spark, defaultLonLatDelimitedGeoData, S2_LVL, ioConfig
+        spark, defaultLonLatDelimitedGeoData, GEO_SENSITIVITY, S2_LVL, ioConfig
       )
 
     clusteringDataset.collect().foreach(println)
@@ -103,7 +104,7 @@ class GeoPropertiesExtractorTest extends FlatSpec{
   {
     val clusteringDataset =
       GeoPropertiesExtractor.fromLonLatDelimitedFile(
-        spark, customLonLatDelimitedGeoData, S2_LVL, customIOConfig
+        spark, customLonLatDelimitedGeoData, GEO_SENSITIVITY, S2_LVL, customIOConfig
       )
 
     clusteringDataset.collect().foreach(println)
@@ -117,7 +118,7 @@ class GeoPropertiesExtractorTest extends FlatSpec{
   {
     val clusteringDataset =
       GeoPropertiesExtractor.fromLonLatDataFrame(
-        spark, defaultLonLatGeoDataframe, S2_LVL, ioConfig
+        spark, defaultLonLatGeoDataframe, GEO_SENSITIVITY, S2_LVL, ioConfig
       )
 
     clusteringDataset.collect().foreach(println)
@@ -127,5 +128,41 @@ class GeoPropertiesExtractorTest extends FlatSpec{
     clusteringDataset.map(_._2.features.toArray).collect() should equal (GEO_DATA_VALUES)
 
   }
+
+  "fromLonLatDataFrame" should "truncate geo decimal places when entered with sensitivity" in
+    {
+      val S2_LVL = 15
+      val GEO_SENSITIVITY = 3
+
+      val lonLatGeoDataframe =
+        spark.createDataFrame(
+          spark.sparkContext.makeRDD(
+            List(
+              Row(34.777112,32.0718015,1,2,3,4,5),
+              Row(34.7747174,32.0774609,6,7,8,9,10)
+            )),
+          StructType(List(
+            StructField("lon", DoubleType, false),
+            StructField("lat", DoubleType, false),
+            StructField("ft1", IntegerType, false),
+            StructField("ft2", IntegerType, false),
+            StructField("ft3", IntegerType, false),
+            StructField("ft4", IntegerType, false),
+            StructField("ft5", IntegerType, false))
+          )
+        )
+
+      val clusteringDataset =
+        GeoPropertiesExtractor.fromLonLatDataFrame(
+          spark, lonLatGeoDataframe, GEO_SENSITIVITY, S2_LVL, ioConfig
+        )
+
+      clusteringDataset.collect().foreach(println)
+
+      clusteringDataset.count() should equal(2)
+      clusteringDataset.map(_._1.geoData).collect() should equal (Array(Array("34.777112", "32.0718015"), Array("34.7747174", "32.0774609")))
+      clusteringDataset.map(_._2.lonLatLocation).collect() should equal (Array((34.777,32.072), (34.775,32.077)))
+
+    }
 
 }

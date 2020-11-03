@@ -21,6 +21,7 @@ class dDBGSCANTest extends FlatSpec{
   spark.sparkContext.setCheckpointDir("/tmp")
 
   val S2_LVL = 15
+  val GEO_SENSITIVITY = MISSING_GEO_DECIMAL_SENSITIVITY_LVL
   val epsilon= 100.0
 
   val complexLonLatDelimitedGeoData =
@@ -66,6 +67,7 @@ class dDBGSCANTest extends FlatSpec{
       epsilon,
       minPts,
       GEO_PARTITIONING_STRATEGY,
+      MISSING_GEO_DECIMAL_SENSITIVITY_LVL,
       S2_LVL,
       DEFAULT_NUM_PARTITIONS,
       DEFAULT_NEIGHBOUR_SIMILARITY_EXTENSION_FUNCTION
@@ -73,7 +75,7 @@ class dDBGSCANTest extends FlatSpec{
 
   val clusteringDataset =
     GeoPropertiesExtractor.fromLonLatDelimitedFile(
-      spark, complexLonLatDelimitedGeoData, S2_LVL, ioConfig
+      spark, complexLonLatDelimitedGeoData, GEO_SENSITIVITY, S2_LVL, ioConfig
     )
 
   "run" should " cluster given instances " in

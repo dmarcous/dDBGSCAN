@@ -22,6 +22,7 @@ class DataGeoClustererTest extends FlatSpec{
   import spark.implicits._
 
   val S2_LVL = 15
+  val GEO_SENSITIVITY = MISSING_GEO_DECIMAL_SENSITIVITY_LVL
   val epsilon= 100.0
 
   val complexLonLatDelimitedGeoData =
@@ -61,6 +62,7 @@ class DataGeoClustererTest extends FlatSpec{
       epsilon,
       minPts,
       GEO_PARTITIONING_STRATEGY,
+      MISSING_GEO_DECIMAL_SENSITIVITY_LVL,
       S2_LVL,
       DEFAULT_NUM_PARTITIONS,
       DEFAULT_NEIGHBOUR_SIMILARITY_EXTENSION_FUNCTION
@@ -70,7 +72,7 @@ class DataGeoClustererTest extends FlatSpec{
 
   val clusteringDataset =
     GeoPropertiesExtractor.fromLonLatDelimitedFile(
-      spark, complexLonLatDelimitedGeoData, S2_LVL, ioConfig
+      spark, complexLonLatDelimitedGeoData, GEO_SENSITIVITY, S2_LVL, ioConfig
     )
   val partitionedData = DataPartitionerS2.partitionData(spark, clusteringDataset, epsilon, S2_LVL)
   val ungroupedPartitionedData = partitionedData.flatMap{case(key, vals) => (vals.map(instance => (key,instance)))}.collect()

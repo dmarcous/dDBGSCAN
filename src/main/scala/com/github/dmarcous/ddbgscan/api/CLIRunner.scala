@@ -31,6 +31,7 @@ object CLIRunner {
     [--positionFieldId int] [--positionFieldLon int] [--positionFieldLat int]
     [--inputFieldDelimiter int]
     [--partitioningStrategy int]
+    [--geoDecimalPlacesSensitivity int]
     [--neighborhoodPartitioningLvl int] [--isNeighbourInstances_function_code int]
     [--numPartitions int]
     [--maxPointsPerPartition int]
@@ -46,6 +47,7 @@ object CLIRunner {
     var positionFieldLat: Int = DEFAULT_LATITUDE_POSITION_FIELD_NUMBER
     var inputFieldDelimiter : String = DEFAULT_GEO_FILE_DELIMITER
     var partitioningStrategy: String = SUPPORTED_PARTITIONING_STRATEGIES.head
+    var geoDecimalPlacesSensitivity: Int = MISSING_GEO_DECIMAL_SENSITIVITY_LVL
     var neighborhoodPartitioningLvl : Int = MISSING_NEIGHBORHOOD_LVL
     var isNeighbourInstances : (Vector, Vector) => Boolean = DEFAULT_NEIGHBOUR_SIMILARITY_EXTENSION_FUNCTION
     var numPartitions : Int = DEFAULT_NUM_PARTITIONS
@@ -62,6 +64,7 @@ object CLIRunner {
       case Array("--outputFolderPath", argOutputFolderPath: String) => outputFolderPath = argOutputFolderPath
       case Array("--epsilon", argEpsilon: String) => epsilon = argEpsilon.toDouble
       case Array("--minPts", argMinPts: String) => minPts = argMinPts.toInt
+      case Array("--geoDecimalPlacesSensitivity", argGeoDecimalPlacesSensitivity: String) => geoDecimalPlacesSensitivity = argGeoDecimalPlacesSensitivity.toInt
       case Array("--neighborhoodPartitioningLvl", argNeighborhoodPartitioningLvl: String) => neighborhoodPartitioningLvl = argNeighborhoodPartitioningLvl.toInt
       case Array("--isNeighbourInstances_function_code", argIsNeighbourInstances_function_code: String) => isNeighbourInstances = NEIGHBOUR_SIMILARITY_EXTENSION_FUNCTION_TRANSLATOR(argIsNeighbourInstances_function_code.toInt)
       case Array("--numPartitions", argNumPartitions: String) => numPartitions = argNumPartitions.toInt
@@ -91,6 +94,13 @@ object CLIRunner {
         SUPPORTED_PARTITIONING_STRATEGIES.head
       }
     println("partitioningStrategy : " + validatedPartitioningStrategy)
+    val validatedGeoDecimalPlacesSensitivity =
+      if(geoDecimalPlacesSensitivity > MISSING_GEO_DECIMAL_SENSITIVITY_LVL && geoDecimalPlacesSensitivity <= MAX_GEO_DECIMAL_SENSITIVITY_LVL) geoDecimalPlacesSensitivity
+      else {
+        println(" Unsupported geo decimal places sensitivity : " + geoDecimalPlacesSensitivity + " (needs to be 0-" + MAX_GEO_DECIMAL_SENSITIVITY_LVL + "), resorting to default of no rounding")
+        MISSING_GEO_DECIMAL_SENSITIVITY_LVL
+      }
+    println("geoDecimalPlacesSensitivity : " + validatedGeoDecimalPlacesSensitivity)
     println("neighborhoodPartitioningLvl : " + neighborhoodPartitioningLvl)
     println("isNeighbourInstances function code : " + isNeighbourInstances.toString())
     println("numPartitions : " + numPartitions)
@@ -112,6 +122,7 @@ object CLIRunner {
         epsilon,
         minPts,
         validatedPartitioningStrategy,
+        validatedGeoDecimalPlacesSensitivity,
         neighborhoodPartitioningLvl,
         maxPointsPerPartition,
         isNeighbourInstances

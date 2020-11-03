@@ -15,6 +15,7 @@ class RuntimeConfigTest extends FlatSpec{
     epsilon,
     minPts,
     GEO_PARTITIONING_STRATEGY,
+    MISSING_GEO_DECIMAL_SENSITIVITY_LVL,
     neighborhoodPartitioningLvl,
     DEFAULT_NUM_PARTITIONS,
     isNeighbourInstances

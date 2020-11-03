@@ -1,6 +1,6 @@
 package com.github.dmarcous.ddbgscan.core.config
 
-import CoreConfig.{DEFAULT_NEIGHBOUR_SIMILARITY_EXTENSION_FUNCTION, DEFAULT_NUM_PARTITIONS, MISSING_NEIGHBORHOOD_LVL, SMALLEST_CELL_AREA_EPSILON_MULTIPLIER, SUPPORTED_PARTITIONING_STRATEGIES}
+import CoreConfig.{DEFAULT_NEIGHBOUR_SIMILARITY_EXTENSION_FUNCTION, DEFAULT_NUM_PARTITIONS, MISSING_NEIGHBORHOOD_LVL, SMALLEST_CELL_AREA_EPSILON_MULTIPLIER, SUPPORTED_PARTITIONING_STRATEGIES, MISSING_GEO_DECIMAL_SENSITIVITY_LVL}
 import com.github.dmarcous.ddbgscan.core.algo.partitioning.DataPartitionerS2
 import com.github.dmarcous.s2utils.converters.UnitConverters
 import com.github.dmarcous.s2utils.s2.S2Utilities
@@ -11,6 +11,7 @@ case class AlgorithmParameters(
     epsilon : Double,
     minPts : Int,
     partitioningStrategy : String = SUPPORTED_PARTITIONING_STRATEGIES.head,
+    geoDecimalPlacesSensitivity : Int = MISSING_GEO_DECIMAL_SENSITIVITY_LVL,
     var neighborhoodPartitioningLvl : Int = MISSING_NEIGHBORHOOD_LVL,
     maxPointsPerPartition : Int = DEFAULT_NUM_PARTITIONS,
     isNeighbourInstances : (Vector, Vector) => Boolean = DEFAULT_NEIGHBOUR_SIMILARITY_EXTENSION_FUNCTION

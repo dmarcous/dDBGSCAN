@@ -12,12 +12,14 @@ import org.scalatest.Matchers._
 class dDBGSCANRunnerTest extends FlatSpec{
   val epsilon = 100.0
   val minPts = 3
+  val geoSensitivity = 3
   val neighborhoodPartitioningLvl = 15
   val isNeighbourInstances = DEFAULT_NEIGHBOUR_SIMILARITY_EXTENSION_FUNCTION
   val parameters = AlgorithmParameters(
     epsilon,
     minPts,
     GEO_PARTITIONING_STRATEGY,
+    MISSING_GEO_DECIMAL_SENSITIVITY_LVL,
     neighborhoodPartitioningLvl,
     DEFAULT_NUM_PARTITIONS,
     isNeighbourInstances
@@ -56,6 +58,38 @@ class dDBGSCANRunnerTest extends FlatSpec{
 
     // Clean output before run
     FileUtils.deleteQuietly(new File(outputFolderPath))
+
+    // Run algorithm
+    dDBGSCANRunner.run(spark, conf)
+  }
+
+  it should "run on truncated data if sensitivity applies " in
+  {
+    // Create outside test so test will get it from here
+    val spark =
+      SparkSession
+        .builder()
+        .master("local")
+        .appName("dDBGSCANRunnerTest")
+        .getOrCreate()
+
+    // Clean output before run
+    FileUtils.deleteQuietly(new File(outputFolderPath))
+
+    val parameters = AlgorithmParameters(
+      epsilon,
+      minPts,
+      GEO_PARTITIONING_STRATEGY,
+      geoSensitivity,
+      neighborhoodPartitioningLvl,
+      DEFAULT_NUM_PARTITIONS,
+      isNeighbourInstances
+    )
+    val conf =
+      RuntimeConfig(
+        ioConfig,
+        parameters
+      )
 
     // Run algorithm
     dDBGSCANRunner.run(spark, conf)

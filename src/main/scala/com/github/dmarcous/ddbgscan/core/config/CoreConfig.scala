@@ -10,6 +10,10 @@ object CoreConfig {
   // Algorithm config defaults
   val MISSING_NEIGHBORHOOD_LVL = -1
 
+  // Geo  Decimal places sensitivity default
+  val MISSING_GEO_DECIMAL_SENSITIVITY_LVL = -1
+  val MAX_GEO_DECIMAL_SENSITIVITY_LVL = 16
+
   // Internal algorithm default helpers
   val SMALLEST_CELL_AREA_EPSILON_MULTIPLIER = 16
 

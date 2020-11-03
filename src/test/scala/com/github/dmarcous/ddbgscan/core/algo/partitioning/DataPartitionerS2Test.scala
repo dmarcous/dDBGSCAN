@@ -1,6 +1,6 @@
 package com.github.dmarcous.ddbgscan.core.algo.partitioning
 
-import com.github.dmarcous.ddbgscan.core.config.CoreConfig.{DEFAULT_GEO_FILE_DELIMITER, DEFAULT_LATITUDE_POSITION_FIELD_NUMBER, DEFAULT_LONGITUDE_POSITION_FIELD_NUMBER, NO_UNIQUE_ID_FIELD}
+import com.github.dmarcous.ddbgscan.core.config.CoreConfig.{DEFAULT_GEO_FILE_DELIMITER, DEFAULT_LATITUDE_POSITION_FIELD_NUMBER, DEFAULT_LONGITUDE_POSITION_FIELD_NUMBER, MISSING_GEO_DECIMAL_SENSITIVITY_LVL, NO_UNIQUE_ID_FIELD}
 import com.github.dmarcous.ddbgscan.core.config.IOConfig
 import com.github.dmarcous.ddbgscan.core.preprocessing.GeoPropertiesExtractor
 import com.github.dmarcous.ddbgscan.model.{KeyGeoEntity, LonLatGeoEntity}
@@ -19,6 +19,7 @@ class DataPartitionerS2Test extends FlatSpec{
   import spark.implicits._
 
   val S2_LVL = 15
+  val GEO_SENSITIVITY = MISSING_GEO_DECIMAL_SENSITIVITY_LVL
   val epsilon_in_range = 10.0
   val epsilon_partly_outside_range = 100.0
   val epsilon_fully_outside_range = 250.0
@@ -73,11 +74,11 @@ class DataPartitionerS2Test extends FlatSpec{
 
   val clusteringDataset =
     GeoPropertiesExtractor.fromLonLatDelimitedFile(
-      spark, defaultLonLatDelimitedGeoData, S2_LVL, ioConfig
+      spark, defaultLonLatDelimitedGeoData, GEO_SENSITIVITY, S2_LVL, ioConfig
     )
   val complexDataset =
     GeoPropertiesExtractor.fromLonLatDelimitedFile(
-      spark, complexLonLatDelimitedGeoData, S2_LVL, ioConfig
+      spark, complexLonLatDelimitedGeoData, GEO_SENSITIVITY, S2_LVL, ioConfig
     )
 
   "getDensityReachableCells" should "get current cell if epsilon is small" in
